@@ -1,3 +1,6 @@
 # -*- coding: utf-8 -*-
-from app import app
-app.run(host='0.0.0.0', port=8080, debug=True)
+import statsdbinterface
+import config
+
+# Start server
+statsdbinterface.server.run(host=config.HOST, port=config.PORT, debug=True)
