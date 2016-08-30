@@ -3,6 +3,7 @@ from statsdbinterface import server
 from flask import jsonify
 
 
+# Return a simple Not Found message upon 404.
 @server.errorhandler(404)
 def not_found(error=None):
     message = {
