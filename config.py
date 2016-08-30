@@ -2,6 +2,9 @@
 
 # Set these manually.
 
+# Set to True to enable debug functions such as Flask's debugging server.
+DEBUG = True
+
 # Bind the web server to this host.
 HOST = '0.0.0.0'
 # Bind the web server to this port.
