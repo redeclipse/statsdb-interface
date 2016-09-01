@@ -1,8 +1,8 @@
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 from tornado.wsgi import WSGIContainer
 from tornado.httpserver import HTTPServer
 from tornado.ioloop import IOLoop
-import statsdbinterface
 import config
 import sys
 
@@ -15,11 +15,14 @@ if __name__ == "__main__":
     # Set data_directory variable from arguments.
     config.data_directory = sys.argv[1]
 
+    # Load the main program after setting required config entries.
+    import statsdbinterface
+
     # Start server.
     if config.DEBUG:
         # Use Flask's debugging server.
         statsdbinterface.server.run(host=config.HOST,
-            port=config.PORT, debug=True)
+                                    port=config.PORT, debug=True)
     else:
         # Use Tornado's HTTPServer.
         http_server = HTTPServer(WSGIContainer(statsdbinterface.server))
