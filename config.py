@@ -10,7 +10,7 @@ HOST = '0.0.0.0'
 # Bind the web server to this port.
 PORT = 28700
 
-# Number of results to return in a api list call (e.g. /api/games).
+# Number of results to return in a api list page (e.g. /api/games?page=3).
 RESULTS_PER_PAGE = 100
 
 
