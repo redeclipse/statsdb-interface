@@ -1,32 +1,19 @@
 # -*- coding: utf-8 -*-
-from sqlalchemy import create_engine
-from sqlalchemy.orm import scoped_session, sessionmaker
-from sqlalchemy.ext.declarative import declarative_base
+from flask_sqlalchemy import SQLAlchemy
 import config
 
 
 # Create database connection and import models.
-def load():
-    # The session and base are used elsewhere.
-    global db_session
-    global Base
+def load(server):
+    # The database is used elsewhere.
+    global db
 
-    engine = create_engine(
-        'sqlite:///%s/stats.sqlite' % (config.data_directory.rstrip('/')),
-                           convert_unicode=True)
-    db_session = scoped_session(sessionmaker(autocommit=False,
-                                             autoflush=False,
-                                             bind=engine))
-    Base = declarative_base()
-    Base.query = db_session.query_property()
+    # Set the SQLAlchemy Database URI from the config.
+    server.config['SQLALCHEMY_DATABASE_URI'] = (
+        'sqlite:///%s/stats.sqlite' % (config.data_directory.rstrip('/')))
 
-    import statsdbinterface.dbmodels
+    # Load the database.
+    db = SQLAlchemy(server)
 
-    Base.metadata.create_all(bind=engine)
-
-
-# Remove the DB session.
-def unload():
-    global db_session
-
-    db_session.remove()
+    # Register models and views.
+    from statsdbinterface import dbmodels, views

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from statsdbinterface import server
+from statsdbinterface import server, dbmodels
 from flask import jsonify
 
 
@@ -12,5 +12,23 @@ def not_found(error=None):
     }
     resp = jsonify(message)
     resp.status_code = 404
+    return resp
 
+
+@server.route("/api/games")
+def api_games():
+    # Get a list of games sorted by id.
+    games = sorted(dbmodels.Game.query.all(), key=lambda g: g.id)
+    ret = []
+    for game in games:
+        ret.append(game.to_dict())
+    resp = jsonify({"games": ret})
+    return resp
+
+
+@server.route("/api/games/<int:gameid>")
+def api_game(gameid):
+    # Get a single game.
+    game = dbmodels.Game.query.filter_by(id=gameid).first_or_404()
+    resp = jsonify(game.to_dict())
     return resp
