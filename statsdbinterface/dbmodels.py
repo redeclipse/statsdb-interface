@@ -27,3 +27,4 @@ class Game(db.Model):
             "uniqueplayers": self.uniqueplayers,
             "usetotals": self.usetotals,
         }
+

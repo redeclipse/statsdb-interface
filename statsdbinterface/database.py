@@ -12,7 +12,7 @@ def load(server):
     server.config['SQLALCHEMY_DATABASE_URI'] = (
         'sqlite:///%s/stats.sqlite' % (config.data_directory.rstrip('/')))
 
-    # Load the database.
+    # Create the SQLAlchemy connection.
     db = SQLAlchemy(server)
 
     # Register models and views.
