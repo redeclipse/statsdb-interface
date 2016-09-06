@@ -21,7 +21,7 @@ def not_found(error=None):
 @server.route("/api/config")
 def api_config():
     return jsonify({
-        "results_per_page": config.RESULTS_PER_PAGE,
+        "api_results_per_page": config.API_RESULTS_PER_PAGE,
     })
 
 
@@ -32,7 +32,7 @@ def api_count_games():
     rowcount = dbmodels.Game.query.count()
     return jsonify({
         "rows": rowcount,
-        "pages": math.ceil(rowcount / config.RESULTS_PER_PAGE),
+        "pages": math.ceil(rowcount / config.API_RESULTS_PER_PAGE),
     })
 
 
@@ -44,8 +44,9 @@ def api_games():
 
     # Get a list of games sorted by id and offset by the page.
     games = sorted(dbmodels.Game.query.limit(
-                config.RESULTS_PER_PAGE).offset(
-                    config.RESULTS_PER_PAGE * page).all(), key=lambda g: g.id)
+                config.API_RESULTS_PER_PAGE).offset(
+                    config.API_RESULTS_PER_PAGE * page).all(),
+                        key=lambda g: g.id)
 
     # Return the list via json.
     ret = []
