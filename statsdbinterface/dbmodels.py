@@ -42,9 +42,9 @@ class GameTeam(db.Model):
     __tablename__ = "game_teams"
 
     game_id = db.Column('game',
-        db.Integer, db.ForeignKey('games.id'), primary_key=True)
+                        db.Integer, db.ForeignKey('games.id'), primary_key=True)
     game = db.relationship('Game',
-        backref=db.backref('teams', lazy='dynamic'))
+                           backref=db.backref('teams', lazy='dynamic'))
     team = db.Column(db.Integer, primary_key=True)
     score = db.Column(db.Integer)
     name = db.Column(db.Text)
@@ -52,16 +52,16 @@ class GameTeam(db.Model):
     def to_dict(self):
         return direct_to_dict(self, [
             "game_id", "team", "score", "name"
-            ])
+        ])
 
 
 class GameFFARound(db.Model):
     __tablename__ = "game_ffarounds"
 
     game_id = db.Column('game',
-        db.Integer, db.ForeignKey('games.id'), primary_key=True)
+                        db.Integer, db.ForeignKey('games.id'), primary_key=True)
     game = db.relationship('Game',
-        backref=db.backref('ffarounds', lazy='dynamic'))
+                           backref=db.backref('ffarounds', lazy='dynamic'))
     player = db.Column(db.Integer, primary_key=True)
     playerhandle = db.Column(db.Text)
     round = db.Column(db.Integer, primary_key=True)
@@ -69,12 +69,12 @@ class GameFFARound(db.Model):
 
     def __repr__(self):
         return '<GameFFARound %d from %d (%d)>' % (self.round,
-            self.game_id, self.player)
+                                                   self.game_id, self.player)
 
     def to_dict(self):
         return direct_to_dict(self, [
             "game_id", "player", "playerhandle", "round", "winner"
-            ])
+        ])
 
 
 class Game(db.Model):
@@ -109,28 +109,28 @@ class Game(db.Model):
 
     def to_dict(self):
         return direct_to_dict(self, [
-                "id", "time",
+            "id", "time",
                 "map", "mode", "mutators",
                 "timeplayed", "uniqueplayers",
                 "usetotals"
-            ],
+        ],
             {
                 "teams": list_to_id_dict([t.to_dict() for t in self.teams],
-                    "team"),
+                                         "team"),
                 "players": list_to_id_dict([p.to_dict() for p in self.players],
-                    "wid"),
+                                           "wid"),
                 "ffarounds": self.combined_ffarounds(),
                 "server": self.server.first().to_dict(),
-            })
+        })
 
 
 class GamePlayer(db.Model):
     __tablename__ = 'game_players'
 
     game_id = db.Column('game',
-        db.Integer, db.ForeignKey('games.id'), primary_key=True)
+                        db.Integer, db.ForeignKey('games.id'), primary_key=True)
     game = db.relationship('Game',
-        backref=db.backref('players', lazy='dynamic'))
+                           backref=db.backref('players', lazy='dynamic'))
     name = db.Column(db.Text)
     handle = db.Column(db.Text)
     score = db.Column(db.Integer)
@@ -158,19 +158,19 @@ class GamePlayer(db.Model):
         return direct_to_dict(self, [
             "game_id", "name", "handle",
             "score", "timealive", "frags", "deaths", "wid", "timeactive"
-            ], {
-                "bombings": self.bombings(),
+        ], {
+            "bombings": self.bombings(),
                 "captures": self.captures(),
-            })
+        })
 
 
 class GameServer(db.Model):
     __tablename__ = 'game_servers'
 
     game_id = db.Column('game',
-        db.Integer, db.ForeignKey('games.id'), primary_key=True)
+                        db.Integer, db.ForeignKey('games.id'), primary_key=True)
     game = db.relationship('Game',
-        backref=db.backref('server', lazy='dynamic'))
+                           backref=db.backref('server', lazy='dynamic'))
     handle = db.Column(db.Text)
     flags = db.Column(db.Text)
     desc = db.Column(db.Text)
@@ -184,4 +184,4 @@ class GameServer(db.Model):
     def to_dict(self):
         return direct_to_dict(self, [
             "game_id", "handle", "flags", "desc", "version", "host", "port"
-            ])
+        ])

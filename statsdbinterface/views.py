@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
-from statsdbinterface import server, dbmodels, extmodels
-from flask import jsonify, request
-import config
 import math
+from flask import jsonify, request
+from statsdbinterface import server, dbmodels, extmodels
+import config
 
 
 # Return a simple Not Found message upon 404.
@@ -80,7 +80,7 @@ def api_players():
 
     # Get the player list.
     players = extmodels.Player.all(page=page,
-        pagesize=config.API_RESULTS_PER_PAGE)
+                                   pagesize=config.API_RESULTS_PER_PAGE)
 
     # Return the list via json.
     ret = []

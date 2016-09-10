@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
+from werkzeug.exceptions import NotFound
 from statsdbinterface.dbmodels import Game, GamePlayer
 from statsdbinterface.modelutils import direct_to_dict
-from werkzeug.exceptions import NotFound
 
 
 class Player:
@@ -9,7 +9,7 @@ class Player:
     def handle_list():
         # Return a list of all player handles in the database.
         return [r[0] for r in
-            GamePlayer.query.with_entities(GamePlayer.handle).filter(
+                GamePlayer.query.with_entities(GamePlayer.handle).filter(
                 GamePlayer.handle != '').group_by(GamePlayer.handle).all()]
 
     def count():
@@ -50,4 +50,4 @@ class Player:
     def to_dict(self):
         return direct_to_dict(self, [
             "handle", "game_ids"
-            ])
+        ])
