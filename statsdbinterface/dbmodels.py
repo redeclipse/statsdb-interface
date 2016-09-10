@@ -1,20 +1,6 @@
 # -*- coding: utf-8 -*-
 from statsdbinterface.database import db
-
-
-# Return a dict from base's attributes.
-def direct_to_dict(base, attributes, update=None):
-    ret = {}
-    for attr in attributes:
-        if type(attr) is tuple:
-            # Different name in the output.
-            ret[attr[1]] = getattr(base, attr[0])
-        else:
-            # Same name in the output.
-            ret[attr] = getattr(base, attr)
-    if update:
-        ret.update(update)
-    return ret
+from statsdbinterface.modelutils import direct_to_dict
 
 
 class Game(db.Model):
