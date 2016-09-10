@@ -96,3 +96,11 @@ def api_player(handle):
     player = extmodels.Player.get_or_404(handle)
     resp = jsonify(player.to_dict())
     return resp
+
+
+# Return a single player's games.
+@server.route("/api/player:games/<string:handle>")
+def api_player_games(handle):
+    player = extmodels.Player.get_or_404(handle)
+    resp = jsonify({"games": player.games()})
+    return resp

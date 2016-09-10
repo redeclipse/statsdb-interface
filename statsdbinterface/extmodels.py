@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from statsdbinterface.dbmodels import GamePlayer
+from statsdbinterface.dbmodels import Game, GamePlayer
 from statsdbinterface.modelutils import direct_to_dict
 from werkzeug.exceptions import NotFound
 
@@ -37,8 +37,17 @@ class Player:
     def __init__(self, handle):
         # Build a Player object from the database.
         self.handle = handle
+        self.game_ids = [r[0] for r in GamePlayer.query.with_entities(
+            GamePlayer.game_id).filter(GamePlayer.handle == self.handle).all()]
+
+    def games(self):
+        # Return full Game objects from Player's game_ids.
+        ret = []
+        for game_id in self.game_ids:
+            ret.append(Game.query.filter(Game.id == game_id).first().to_dict())
+        return ret
 
     def to_dict(self):
         return direct_to_dict(self, [
-            "handle"
+            "handle", "game_ids"
             ])

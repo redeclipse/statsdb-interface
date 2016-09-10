@@ -33,7 +33,7 @@ class Game(db.Model):
 class GamePlayer(db.Model):
     __tablename__ = 'game_players'
 
-    gameid = db.Column('game',
+    game_id = db.Column('game',
         db.Integer, db.ForeignKey('games.id'), primary_key=True)
     game = db.relationship('Game',
         backref=db.backref('players', lazy='dynamic'))
@@ -48,10 +48,10 @@ class GamePlayer(db.Model):
 
     def __repr__(self):
         return '<GamePlayer %d from %d (%s [%s])>' % (
-            self.wid, self.gameid, self.name, self.handle)
+            self.wid, self.game_id, self.name, self.handle)
 
     def to_dict(self):
         return direct_to_dict(self, [
-            "gameid", "name", "handle",
+            "game_id", "name", "handle",
             "score", "timealive", "frags", "deaths", "wid", "timeactive"
             ])
