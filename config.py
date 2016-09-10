@@ -11,7 +11,7 @@ HOST = '0.0.0.0'
 PORT = 28700
 
 # Number of results to return in a api list page (e.g. /api/games?page=3).
-API_RESULTS_PER_PAGE = 100
+API_RESULTS_PER_PAGE = 25
 
 
 # These are set in other parts of the program.

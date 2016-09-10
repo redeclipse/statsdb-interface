@@ -160,7 +160,7 @@ class GamePlayer(db.Model):
             "score", "timealive", "frags", "deaths", "wid", "timeactive"
         ], {
             "bombings": self.bombings(),
-                "captures": self.captures(),
+            "captures": self.captures(),
         })
 
 
