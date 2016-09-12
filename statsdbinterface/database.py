@@ -2,6 +2,16 @@
 from flask_sqlalchemy import SQLAlchemy
 import config
 
+db_functions = []
+
+
+# Use as decorator, append f to db_functions.
+def db_function(name, num_params):
+    def d(f):
+        db_functions.append((name, num_params, f))
+        return f
+    return d
+
 
 # Create database connection and import models.
 def load(server):
@@ -15,5 +25,10 @@ def load(server):
     # Create the SQLAlchemy connection.
     db = SQLAlchemy(server)
 
-    # Register models and views.
-    from statsdbinterface import dbmodels, views
+    @db.event.listens_for(db.engine, 'begin')
+    def register_functions(conn):
+        for f in db_functions:
+            conn.connection.create_function(f[0], f[1], f[2])
+
+    # Register models, functions and views.
+    from statsdbinterface import redeclipse, dbmodels, views

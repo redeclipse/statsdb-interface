@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 from werkzeug.exceptions import NotFound
+from statsdbinterface.database import db
 from statsdbinterface.dbmodels import Game, GamePlayer, GameServer
 from statsdbinterface.modelutils import direct_to_dict
+import config
 
 
 class Player:
@@ -47,10 +49,7 @@ class Player:
         ids = (self.game_ids[page * pagesize:page * pagesize + pagesize]
                 if pagesize is not None else
                 self.game_ids)
-        ret = []
-        for game_id in ids:
-            ret.append(Game.query.filter(Game.id == game_id).first().to_dict())
-        return ret
+        return Game.query.filter(Game.id.in_(ids)).all()
 
     def to_dict(self):
         return direct_to_dict(self, [
@@ -89,7 +88,7 @@ class Server:
         return [Server(handle) for handle in filtered_handles]
 
     def __init__(self, handle):
-        # Build a Player object from the database.
+        # Build a Server object from the database.
         self.handle = handle
         self.game_ids = [r[0] for r in GameServer.query.with_entities(
             GameServer.game_id).filter(GameServer.handle == self.handle).all()
@@ -101,12 +100,83 @@ class Server:
         ids = (self.game_ids[page * pagesize:page * pagesize + pagesize]
                 if pagesize is not None else
                 self.game_ids)
-        ret = []
-        for game_id in ids:
-            ret.append(Game.query.filter(Game.id == game_id).first().to_dict())
-        return ret
+        return Game.query.filter(Game.id.in_(ids)).all()
 
     def to_dict(self):
         return direct_to_dict(self, [
             "handle", "game_ids"
         ])
+
+
+class Map:
+
+    def map_list():
+        # Return a list of all map names in the database.
+        return [r[0] for r in
+                Game.query.with_entities(Game.map).group_by(Game.map).all()]
+
+    def count():
+        # Return the number of maps in the database.
+        return Game.query.with_entities(Game.map).group_by(Game.map).count()
+
+    def get_or_404(name):
+        # Return a Map for <name> if <name> exists, otherwise 404.
+        handles = Map.map_list()
+        if name in handles:
+            return Map(name)
+        else:
+            raise NotFound
+
+    def all(page=0, pagesize=None):
+        # Return all m, with optional paging.
+        filtered_names = names = Map.map_list()
+        # If pagesize is specified, only return page <page> from the list.
+        if pagesize is not None:
+            filtered_names = names[
+                page * pagesize:page * pagesize + pagesize]
+        return [Map(name) for name in filtered_names]
+
+    def __init__(self, name):
+        # Build a Map object from the database.
+        self.name = name
+        self.game_ids = [r[0] for r in
+            Game.query.with_entities(Game.id).filter(
+                Game.map == self.name).all()]
+
+    def games(self, page=0, pagesize=None):
+        # Return full Game objects from Map's game_ids.
+        ids = (self.game_ids[page * pagesize:page * pagesize + pagesize]
+                if pagesize is not None else
+                self.game_ids)
+        return Game.query.filter(Game.id.in_(ids)).all()
+
+    def topraces(self):
+        return [
+            {
+                "game_id": r[0],
+                "handle": r[1],
+                "name": r[2],
+                "score": r[3],
+            }
+            for r in
+            (
+            GamePlayer.query
+                .with_entities(GamePlayer.game_id, GamePlayer.handle,
+                    GamePlayer.name, GamePlayer.score)
+                .filter(GamePlayer.game_id.in_(self.game_ids))
+                .filter(db.func.re_mode(GamePlayer.game_id, 'race'))
+                .filter(GamePlayer.score > 0)
+                .group_by(GamePlayer.handle)
+                .having(db.func.min(GamePlayer.score))
+                .order_by(GamePlayer.score.asc())
+                .limit(config.API_HIGHSCORE_RESULTS)
+                .all()
+            )
+        ]
+
+    def to_dict(self):
+        return direct_to_dict(self, [
+            "name", "game_ids"
+        ], {
+            "topraces": self.topraces(),
+        })
