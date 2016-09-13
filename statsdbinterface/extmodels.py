@@ -151,6 +151,7 @@ class Map:
         return Game.query.filter(Game.id.in_(ids)).all()
 
     def topraces(self):
+        # Return a dictionary of the top race times.
         return [
             {
                 "game_id": r[0],
@@ -161,11 +162,17 @@ class Map:
             for r in
             (
             GamePlayer.query
+                # We only need some information.
                 .with_entities(GamePlayer.game_id, GamePlayer.handle,
                     GamePlayer.name, GamePlayer.score)
+                # Only games from this map.
                 .filter(GamePlayer.game_id.in_(self.game_ids))
+                # Only timed race.
                 .filter(db.func.re_mode(GamePlayer.game_id, 'race'))
+                .filter(db.func.re_mut(GamePlayer.game_id, 'timed'))
+                # Scores of 0 indicated the race was never completed.
                 .filter(GamePlayer.score > 0)
+                # Get only the best score from each handle.
                 .group_by(GamePlayer.handle)
                 .having(db.func.min(GamePlayer.score))
                 .order_by(GamePlayer.score.asc())
