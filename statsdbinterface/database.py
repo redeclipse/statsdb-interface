@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import inspect
+import traceback
 from flask_sqlalchemy import SQLAlchemy
 import config
 
@@ -9,7 +10,13 @@ db_functions = []
 # Use as decorator, append f to db_functions.
 def db_function(name):
     def d(f):
-        db_functions.append((name, len(inspect.getargspec(f)[0]), f))
+        def w(*args, **kwargs):
+            try:
+                return f(*args, **kwargs)
+            except:
+                traceback.print_exc()
+                raise
+        db_functions.append((name, len(inspect.getargspec(f)[0]), w))
         return f
     return d
 

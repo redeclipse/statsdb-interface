@@ -170,11 +170,12 @@ class Map:
                 # Only timed race.
                 .filter(db.func.re_mode(GamePlayer.game_id, 'race'))
                 .filter(db.func.re_mut(GamePlayer.game_id, 'timed'))
-                # Scores of 0 indicated the race was never completed.
+                # Scores of 0 indicate the race was never completed.
                 .filter(GamePlayer.score > 0)
                 # Get only the best score from each handle.
                 .group_by(GamePlayer.handle)
                 .having(db.func.min(GamePlayer.score))
+                # Finally: order, limit, and fetch.
                 .order_by(GamePlayer.score.asc())
                 .limit(config.API_HIGHSCORE_RESULTS)
                 .all()
