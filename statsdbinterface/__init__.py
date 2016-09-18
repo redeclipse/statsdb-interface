@@ -6,4 +6,4 @@ server = Flask(__name__)
 from statsdbinterface import database
 
 # Load the database.
-database.load(server)
+database.setup_db(server)

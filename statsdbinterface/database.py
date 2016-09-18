@@ -21,17 +21,20 @@ def db_function(name):
     return d
 
 
+db = SQLAlchemy()
+
+
 # Create database connection and import models.
-def load(server):
-    # The database is used elsewhere.
-    global db
+def setup_db(server):
+    # initialize Flask-SQLAlchemy following app factory pattern
+    # http://flask.pocoo.org/docs/0.11/patterns/appfactories/
+    db.init_app(server)
 
     # Set the SQLAlchemy Database URI from the config.
     server.config['SQLALCHEMY_DATABASE_URI'] = (
         'sqlite:///%s/stats.sqlite' % (config.data_directory.rstrip('/')))
 
     # Create the SQLAlchemy connection.
-    db = SQLAlchemy(server)
 
     @db.event.listens_for(db.engine, 'begin')
     def register_functions(conn):
