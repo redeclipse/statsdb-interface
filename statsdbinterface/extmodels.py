@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
+
 from werkzeug.exceptions import NotFound
-from statsdbinterface.database import db
-from statsdbinterface.dbmodels import Game, GamePlayer, GameServer
-from statsdbinterface.modelutils import direct_to_dict
+from .database import db
+from .dbmodels import Game, GamePlayer, GameServer
+from .modelutils import direct_to_dict
 import config
 
 

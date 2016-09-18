@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
+
 import math
 from flask import jsonify, request
-from statsdbinterface import server, dbmodels, extmodels
+from . import server, dbmodels, extmodels
 import config
 
 

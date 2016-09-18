@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
-from statsdbinterface.database import db_function
-from statsdbinterface.dbmodels import Game
+
+from ..database import db_function
+from ..dbmodels import Game
 from . import versions
 
 

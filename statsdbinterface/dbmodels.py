@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
+
 from sqlalchemy import and_
-from statsdbinterface.database import db
-from statsdbinterface.modelutils import direct_to_dict, list_to_id_dict
+from .database import db
+from .modelutils import direct_to_dict, list_to_id_dict
 
 
 class GameBombing(db.Model):

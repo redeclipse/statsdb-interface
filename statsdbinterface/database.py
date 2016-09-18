@@ -42,4 +42,4 @@ def setup_db(server):
             conn.connection.create_function(f[0], f[1], f[2])
 
     # Register models, functions and views.
-    from statsdbinterface import redeclipse, dbmodels, views
+    from . import redeclipse, dbmodels, views
