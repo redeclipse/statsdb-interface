@@ -25,21 +25,22 @@ db = SQLAlchemy()
 
 
 # Create database connection and import models.
-def setup_db(server):
+def setup_db(app):
     # initialize Flask-SQLAlchemy following app factory pattern
     # http://flask.pocoo.org/docs/0.11/patterns/appfactories/
-    db.init_app(server)
+    db.init_app(app)
 
     # Set the SQLAlchemy Database URI from the config.
-    server.config['SQLALCHEMY_DATABASE_URI'] = (
+    app.config['SQLALCHEMY_DATABASE_URI'] = (
         'sqlite:///%s/stats.sqlite' % (config.data_directory.rstrip('/')))
 
     # Create the SQLAlchemy connection.
 
-    @db.event.listens_for(db.engine, 'begin')
-    def register_functions(conn):
-        for f in db_functions:
-            conn.connection.create_function(f[0], f[1], f[2])
+    with app.app_context():
+        @db.event.listens_for(db.engine, 'begin')
+        def register_functions(conn):
+            for f in db_functions:
+                conn.connection.create_function(f[0], f[1], f[2])
 
     # Register models, functions and views.
     from . import redeclipse, dbmodels, views
