@@ -96,7 +96,7 @@ class RE:
 class RE_1_5_dev(RE):
     # Limits
     start = "1.5.4"
-    end = DEFAULT_VERSION
+    end = "1.5.6"
 
     # Weapon Lists
     loadoutweaponlist = ["sword", "shotgun",
