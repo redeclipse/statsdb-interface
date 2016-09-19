@@ -9,17 +9,20 @@ import config
 
 class Player:
 
+    @staticmethod
     def handle_list():
         # Return a list of all player handles in the database.
         return [r[0] for r in
                 GamePlayer.query.with_entities(GamePlayer.handle).filter(
                 GamePlayer.handle != '').group_by(GamePlayer.handle).all()]
 
+    @staticmethod
     def count():
         # Return the number of handles in the database.
         return GamePlayer.query.filter(
             GamePlayer.handle != '').group_by(GamePlayer.handle).count()
 
+    @staticmethod
     def get_or_404(handle):
         # Return a Player for <handle> if <handle> exists, otherwise 404.
         handles = Player.handle_list()
@@ -28,6 +31,7 @@ class Player:
         else:
             raise NotFound
 
+    @staticmethod
     def all(page=0, pagesize=None):
         # Return all players, with optional paging.
         filtered_handles = handles = Player.handle_list()
@@ -60,17 +64,20 @@ class Player:
 
 class Server:
 
+    @staticmethod
     def handle_list():
         # Return a list of all server handles in the database.
         return [r[0] for r in
                 GameServer.query.with_entities(GameServer.handle).filter(
                 GameServer.handle != '').group_by(GameServer.handle).all()]
 
+    @staticmethod
     def count():
         # Return the number of handles in the database.
         return GameServer.query.filter(
             GameServer.handle != '').group_by(GameServer.handle).count()
 
+    @staticmethod
     def get_or_404(handle):
         # Return a Server for <handle> if <handle> exists, otherwise 404.
         handles = Server.handle_list()
@@ -111,15 +118,18 @@ class Server:
 
 class Map:
 
+    @staticmethod
     def map_list():
         # Return a list of all map names in the database.
         return [r[0] for r in
                 Game.query.with_entities(Game.map).group_by(Game.map).all()]
 
+    @staticmethod
     def count():
         # Return the number of maps in the database.
         return Game.query.with_entities(Game.map).group_by(Game.map).count()
 
+    @staticmethod
     def get_or_404(name):
         # Return a Map for <name> if <name> exists, otherwise 404.
         handles = Map.map_list()
