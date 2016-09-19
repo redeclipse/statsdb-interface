@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
+
 from collections import OrderedDict
-from statsdbinterface.dbmodels import Game
+from ..dbmodels import Game
 
 DEFAULT_VERSION = "1.5.6"
 

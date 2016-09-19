@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-
 # Return a dict from base's attributes.
 def direct_to_dict(base, attributes, update=None):
     ret = {}
