@@ -22,7 +22,7 @@ if __name__ == "__main__":
     if config.DEBUG:
         # Use Flask's debugging server.
         statsdbinterface.app.run(host=config.HOST,
-                                    port=config.PORT, debug=True)
+                                 port=config.PORT, debug=True)
     else:
         # Use Tornado's HTTPServer.
         http_server = HTTPServer(WSGIContainer(statsdbinterface.app))
