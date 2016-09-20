@@ -18,19 +18,24 @@ def not_found(error=None):
     return resp
 
 
-# Return configuration information.
 @server.route("/api/config")
 def api_config():
+    """
+    Return configuration information.
+    """
+
     return jsonify({
         "api_results_per_page": config.API_RESULTS_PER_PAGE,
         "api_highscore_results": config.API_HIGHSCORE_RESULTS,
     })
 
 
-# The /count/ functions return rows and pages for the lists.
-
 @server.route("/api/count/games")
 def api_count_games():
+    """
+    The /count/ functions return rows and pages for the lists.
+    """
+
     rowcount = dbmodels.Game.query.count()
     return jsonify({
         "rows": rowcount,
@@ -95,9 +100,12 @@ def api_count_map_games(name):
     })
 
 
-# Return a list of games.
 @server.route("/api/games")
 def api_games():
+    """
+    Return a list of games.
+    """
+
     # Get the page number.
     page = request.args.get("page", default=0, type=int)
 
@@ -114,17 +122,23 @@ def api_games():
     return resp
 
 
-# Return a single game.
 @server.route("/api/games/<int:gameid>")
 def api_game(gameid):
+    """
+    Return a single game.
+    """
+
     game = dbmodels.Game.query.filter_by(id=gameid).first_or_404()
     resp = jsonify(game.to_dict())
     return resp
 
 
-# Return a list of players.
 @server.route("/api/players")
 def api_players():
+    """
+    Return a list of players.
+    """
+
     # Get the page number.
     page = request.args.get("page", default=0, type=int)
 
@@ -140,29 +154,43 @@ def api_players():
     return resp
 
 
-# Return a single player.
 @server.route("/api/players/<string:handle>")
 def api_player(handle):
+    """
+    Return a single player.
+    """
+
     player = extmodels.Player.get_or_404(handle)
     resp = jsonify(player.to_dict())
     return resp
 
 
-# Return a single player's games.
 @server.route("/api/player:games/<string:handle>")
 def api_player_games(handle):
+    """
+    Return a single player's games.
+    """
+
     # Get the page number.
     page = request.args.get("page", default=0, type=int)
 
     player = extmodels.Player.get_or_404(handle)
-    resp = jsonify({"games": [g.to_dict() for g in player.games(page=page,
-        pagesize=config.API_RESULTS_PER_PAGE)]})
+
+    resp = jsonify(games=[
+        g.to_dict() for g in player.games(
+            page=page, pagesize=config.API_RESULTS_PER_PAGE
+        )
+    ])
+
     return resp
 
 
-# Return a list of servers.
 @server.route("/api/servers")
 def api_servers():
+    """
+    Return a list of servers.
+    """
+
     # Get the page number.
     page = request.args.get("page", default=0, type=int)
 
@@ -172,65 +200,97 @@ def api_servers():
 
     # Return the list via json.
     ret = []
+
     for server in servers:
         ret.append(server.to_dict())
+
     resp = jsonify({"servers": ret})
+
     return resp
 
 
-# Return a single server.
 @server.route("/api/servers/<string:handle>")
 def api_server(handle):
+    """
+    Return a single server.
+    """
+
     server = extmodels.Server.get_or_404(handle)
     resp = jsonify(server.to_dict())
+
     return resp
 
 
-# Return a single server's games.
 @server.route("/api/server:games/<string:handle>")
 def api_server_games(handle):
+    """
+    Return a single server's games.
+    """
+
     # Get the page number.
     page = request.args.get("page", default=0, type=int)
 
     server = extmodels.Server.get_or_404(handle)
-    resp = jsonify({"games": [g.to_dict() for g in server.games(page=page,
-        pagesize=config.API_RESULTS_PER_PAGE)]})
+
+    resp = jsonify(games=[
+        g.to_dict() for g in
+        server.games(page=page, pagesize=config.API_RESULTS_PER_PAGE)
+    ])
+
     return resp
 
 
-# Return a list of maps.
 @server.route("/api/maps")
 def api_maps():
+    """
+    Return a list of maps.
+    """
+
     # Get the page number.
     page = request.args.get("page", default=0, type=int)
 
     # Get the player list.
-    maps = extmodels.Map.all(page=page,
-                                   pagesize=config.API_RESULTS_PER_PAGE)
+    maps = extmodels.Map.all(page=page, pagesize=config.API_RESULTS_PER_PAGE)
 
     # Return the list via json.
     ret = []
+
     for map_ in maps:
         ret.append(map_.to_dict())
+
     resp = jsonify({"maps": ret})
+
     return resp
 
 
-# Return a single map.
 @server.route("/api/maps/<string:name>")
 def api_map(name):
+    """
+    Return a single map.
+    """
+
     map_ = extmodels.Map.get_or_404(name)
     resp = jsonify(map_.to_dict())
     return resp
 
 
-# Return a single map's games.
 @server.route("/api/map:games/<string:name>")
 def api_map_games(name):
+    """
+    Return a single map's games.
+    """
+
     # Get the page number.
     page = request.args.get("page", default=0, type=int)
 
     map_ = extmodels.Map.get_or_404(name)
-    resp = jsonify({"games": [g.to_dict() for g in map_.games(page=page,
-        pagesize=config.API_RESULTS_PER_PAGE)]})
+
+    resp = jsonify(
+        {
+            "games": [g.to_dict() for g in map_.games(
+                page=page, pagesize=config.API_RESULTS_PER_PAGE
+            )]
+        }
+    )
+
     return resp

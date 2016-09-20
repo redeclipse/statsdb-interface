@@ -4,11 +4,11 @@ from werkzeug.exceptions import NotFound
 from .database import db
 from .dbmodels import Game, GamePlayer, GameServer
 from .modelutils import direct_to_dict
+
 import config
 
 
 class Player:
-
     @staticmethod
     def handle_list():
         # Return a list of all player handles in the database.
@@ -52,8 +52,7 @@ class Player:
     def games(self, page=0, pagesize=None):
         # Return full Game objects from Player's game_ids.
         ids = (self.game_ids[page * pagesize:page * pagesize + pagesize]
-                if pagesize is not None else
-                self.game_ids)
+               if pagesize is not None else self.game_ids)
         return Game.query.filter(Game.id.in_(ids)).all()
 
     def to_dict(self):
@@ -106,8 +105,8 @@ class Server:
     def games(self, page=0, pagesize=None):
         # Return full Game objects from Server's game_ids.
         ids = (self.game_ids[page * pagesize:page * pagesize + pagesize]
-                if pagesize is not None else
-                self.game_ids)
+               if pagesize is not None else
+               self.game_ids)
         return Game.query.filter(Game.id.in_(ids)).all()
 
     def to_dict(self):
@@ -117,7 +116,6 @@ class Server:
 
 
 class Map:
-
     @staticmethod
     def map_list():
         # Return a list of all map names in the database.
@@ -150,15 +148,18 @@ class Map:
     def __init__(self, name):
         # Build a Map object from the database.
         self.name = name
-        self.game_ids = [r[0] for r in
+        self.game_ids = [
+            [0] for r in
             Game.query.with_entities(Game.id).filter(
-                Game.map == self.name).all()]
+                Game.map == self.name
+            ).all()
+        ]
 
     def games(self, page=0, pagesize=None):
         # Return full Game objects from Map's game_ids.
         ids = (self.game_ids[page * pagesize:page * pagesize + pagesize]
-                if pagesize is not None else
-                self.game_ids)
+               if pagesize is not None else
+               self.game_ids)
         return Game.query.filter(Game.id.in_(ids)).all()
 
     def topraces(self):
@@ -172,10 +173,12 @@ class Map:
             }
             for r in
             (
-            GamePlayer.query
+                GamePlayer.query
                 # We only need some information.
-                .with_entities(GamePlayer.game_id, GamePlayer.handle,
-                    GamePlayer.name, GamePlayer.score)
+                .with_entities(
+                    GamePlayer.game_id, GamePlayer.handle,
+                    GamePlayer.name, GamePlayer.score
+                )
                 # Only games from this map.
                 .filter(GamePlayer.game_id.in_(self.game_ids))
                 # Only timed race.
