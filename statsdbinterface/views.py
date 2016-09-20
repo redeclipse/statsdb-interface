@@ -2,12 +2,12 @@
 
 import math
 from flask import jsonify, request
-from . import server, dbmodels, extmodels
+from . import app, dbmodels, extmodels
 import config
 
 
 # Return a simple Not Found message upon 404.
-@server.errorhandler(404)
+@app.errorhandler(404)
 def not_found(error=None):
     message = {
         'status': 404,
@@ -18,7 +18,7 @@ def not_found(error=None):
     return resp
 
 
-@server.route("/api/config")
+@app.route("/api/config")
 def api_config():
     """
     Return configuration information.
@@ -30,7 +30,7 @@ def api_config():
     })
 
 
-@server.route("/api/count/games")
+@app.route("/api/count/games")
 def api_count_games():
     """
     The /count/ functions return rows and pages for the lists.
@@ -43,7 +43,7 @@ def api_count_games():
     })
 
 
-@server.route("/api/count/players")
+@app.route("/api/count/players")
 def api_count_players():
     rowcount = extmodels.Player.count()
     return jsonify({
@@ -52,7 +52,7 @@ def api_count_players():
     })
 
 
-@server.route("/api/count/player:games/<string:handle>")
+@app.route("/api/count/player:games/<string:handle>")
 def api_count_player_games(handle):
     player = extmodels.Player.get_or_404(handle)
     rowcount = len(player.game_ids)
@@ -62,7 +62,7 @@ def api_count_player_games(handle):
     })
 
 
-@server.route("/api/count/servers")
+@app.route("/api/count/servers")
 def api_count_servers():
     rowcount = extmodels.Server.count()
     return jsonify({
@@ -71,7 +71,7 @@ def api_count_servers():
     })
 
 
-@server.route("/api/count/server:games/<string:handle>")
+@app.route("/api/count/server:games/<string:handle>")
 def api_count_server_games(handle):
     server = extmodels.Server.get_or_404(handle)
     rowcount = len(server.game_ids)
@@ -81,7 +81,7 @@ def api_count_server_games(handle):
     })
 
 
-@server.route("/api/count/maps")
+@app.route("/api/count/maps")
 def api_count_maps():
     rowcount = extmodels.Map.count()
     return jsonify({
@@ -90,7 +90,7 @@ def api_count_maps():
     })
 
 
-@server.route("/api/count/map:games/<string:name>")
+@app.route("/api/count/map:games/<string:name>")
 def api_count_map_games(name):
     map_ = extmodels.Map.get_or_404(name)
     rowcount = len(map_.game_ids)
@@ -100,7 +100,7 @@ def api_count_map_games(name):
     })
 
 
-@server.route("/api/games")
+@app.route("/api/games")
 def api_games():
     """
     Return a list of games.
@@ -122,7 +122,7 @@ def api_games():
     return resp
 
 
-@server.route("/api/games/<int:gameid>")
+@app.route("/api/games/<int:gameid>")
 def api_game(gameid):
     """
     Return a single game.
@@ -133,7 +133,7 @@ def api_game(gameid):
     return resp
 
 
-@server.route("/api/players")
+@app.route("/api/players")
 def api_players():
     """
     Return a list of players.
@@ -154,7 +154,7 @@ def api_players():
     return resp
 
 
-@server.route("/api/players/<string:handle>")
+@app.route("/api/players/<string:handle>")
 def api_player(handle):
     """
     Return a single player.
@@ -165,7 +165,7 @@ def api_player(handle):
     return resp
 
 
-@server.route("/api/player:games/<string:handle>")
+@app.route("/api/player:games/<string:handle>")
 def api_player_games(handle):
     """
     Return a single player's games.
@@ -185,7 +185,7 @@ def api_player_games(handle):
     return resp
 
 
-@server.route("/api/servers")
+@app.route("/api/servers")
 def api_servers():
     """
     Return a list of servers.
@@ -209,7 +209,7 @@ def api_servers():
     return resp
 
 
-@server.route("/api/servers/<string:handle>")
+@app.route("/api/servers/<string:handle>")
 def api_server(handle):
     """
     Return a single server.
@@ -221,7 +221,7 @@ def api_server(handle):
     return resp
 
 
-@server.route("/api/server:games/<string:handle>")
+@app.route("/api/server:games/<string:handle>")
 def api_server_games(handle):
     """
     Return a single server's games.
@@ -240,7 +240,7 @@ def api_server_games(handle):
     return resp
 
 
-@server.route("/api/maps")
+@app.route("/api/maps")
 def api_maps():
     """
     Return a list of maps.
@@ -263,7 +263,7 @@ def api_maps():
     return resp
 
 
-@server.route("/api/maps/<string:name>")
+@app.route("/api/maps/<string:name>")
 def api_map(name):
     """
     Return a single map.
@@ -274,7 +274,7 @@ def api_map(name):
     return resp
 
 
-@server.route("/api/map:games/<string:name>")
+@app.route("/api/map:games/<string:name>")
 def api_map_games(name):
     """
     Return a single map's games.

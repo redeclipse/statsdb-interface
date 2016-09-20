@@ -21,10 +21,10 @@ if __name__ == "__main__":
     # Start server.
     if config.DEBUG:
         # Use Flask's debugging server.
-        statsdbinterface.server.run(host=config.HOST,
+        statsdbinterface.app.run(host=config.HOST,
                                     port=config.PORT, debug=True)
     else:
         # Use Tornado's HTTPServer.
-        http_server = HTTPServer(WSGIContainer(statsdbinterface.server))
+        http_server = HTTPServer(WSGIContainer(statsdbinterface.app))
         http_server.listen(address=config.HOST, port=config.PORT)
         IOLoop.instance().start()
