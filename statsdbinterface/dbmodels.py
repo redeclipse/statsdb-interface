@@ -43,7 +43,8 @@ class GameTeam(db.Model):
     __tablename__ = "game_teams"
 
     game_id = db.Column('game',
-                        db.Integer, db.ForeignKey('games.id'), primary_key=True)
+                        db.Integer, db.ForeignKey('games.id'),
+                        primary_key=True)
     game = db.relationship('Game',
                            backref=db.backref('teams', lazy='dynamic'))
     team = db.Column(db.Integer, primary_key=True)
@@ -60,7 +61,8 @@ class GameFFARound(db.Model):
     __tablename__ = "game_ffarounds"
 
     game_id = db.Column('game',
-                        db.Integer, db.ForeignKey('games.id'), primary_key=True)
+                        db.Integer, db.ForeignKey('games.id'),
+                        primary_key=True)
     game = db.relationship('Game',
                            backref=db.backref('ffarounds', lazy='dynamic'))
     player = db.Column(db.Integer, primary_key=True)
@@ -109,12 +111,14 @@ class Game(db.Model):
         return ffarounds
 
     def to_dict(self):
-        return direct_to_dict(self, [
-            "id", "time",
+        return direct_to_dict(
+            self,
+            [
+                "id", "time",
                 "map", "mode", "mutators",
                 "timeplayed", "uniqueplayers",
                 "usetotals"
-        ],
+            ],
             {
                 "teams": list_to_id_dict([t.to_dict() for t in self.teams],
                                          "team"),
@@ -122,14 +126,16 @@ class Game(db.Model):
                                            "wid"),
                 "ffarounds": self.combined_ffarounds(),
                 "server": self.server.first().to_dict(),
-        })
+            }
+        )
 
 
 class GamePlayer(db.Model):
     __tablename__ = 'game_players'
 
     game_id = db.Column('game',
-                        db.Integer, db.ForeignKey('games.id'), primary_key=True)
+                        db.Integer, db.ForeignKey('games.id'),
+                        primary_key=True)
     game = db.relationship('Game',
                            backref=db.backref('players', lazy='dynamic'))
     name = db.Column(db.Text)
@@ -169,7 +175,8 @@ class GameServer(db.Model):
     __tablename__ = 'game_servers'
 
     game_id = db.Column('game',
-                        db.Integer, db.ForeignKey('games.id'), primary_key=True)
+                        db.Integer, db.ForeignKey('games.id'),
+                        primary_key=True)
     game = db.relationship('Game',
                            backref=db.backref('server', lazy='dynamic'))
     handle = db.Column(db.Text)

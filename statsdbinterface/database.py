@@ -1,14 +1,20 @@
 # -*- coding: utf-8 -*-
+
+from flask_sqlalchemy import SQLAlchemy
+
 import inspect
 import traceback
-from flask_sqlalchemy import SQLAlchemy
 import config
+
 
 db_functions = []
 
 
-# Use as decorator, append f to db_functions.
 def db_function(name):
+    """
+    Use as decorator, append f to db_functions.
+    """
+
     def d(f):
         def w(*args, **kwargs):
             try:
@@ -24,8 +30,11 @@ def db_function(name):
 db = SQLAlchemy()
 
 
-# Create database connection and import models.
 def setup_db(app):
+    """
+    Create database connection and import models.
+    """
+
     # initialize Flask-SQLAlchemy following app factory pattern
     # http://flask.pocoo.org/docs/0.11/patterns/appfactories/
     db.init_app(app)
@@ -43,4 +52,4 @@ def setup_db(app):
                 conn.connection.create_function(f[0], f[1], f[2])
 
     # Register models, functions and views.
-    from . import redeclipse, dbmodels, views
+    from . import redeclipse, dbmodels, views  # noqa

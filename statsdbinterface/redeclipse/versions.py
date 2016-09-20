@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 
-from collections import OrderedDict
 from ..dbmodels import Game
+from collections import OrderedDict
+
 
 DEFAULT_VERSION = "1.5.6"
 
@@ -47,9 +48,8 @@ def reversion(c):
 
 
 class RE:
-
     def __init__(self):
-        #Core mode names
+        # Core mode names
         self.cmodestr = {}
         for k, v in list(self.modes.items()):
             self.cmodestr[v] = k
@@ -60,7 +60,7 @@ class RE:
                 ret[mut] = 1 << (i + a)
             return ret
 
-        #Create Mutator Lists
+        # Create Mutator Lists
         gspnum = self.basemuts.index("gsp")
         self.basemuts = tomuts(self.basemuts)
         del self.basemuts["gsp"]
@@ -99,15 +99,14 @@ class RE_1_5_dev(RE):
     end = "1.5.6"
 
     # Weapon Lists
-    loadoutweaponlist = ["sword", "shotgun",
-        "smg", "flamer", "plasma", "zapper", "rifle"]
-    weaponlist = [
-        "claw", "pistol"
-        ] + loadoutweaponlist + [
-        "grenade", "mine", "rocket", "melee"]
+    loadoutweaponlist = [
+        "sword", "shotgun", "smg", "flamer", "plasma", "zapper", "rifle"
+    ]
+    weaponlist = ["claw", "pistol"] + loadoutweaponlist + \
+                 ["grenade", "mine", "rocket", "melee"]
     notwielded = ["melee"]
 
-    #Mode Lists
+    # Mode Lists
     modes = {
         "dm": 2,
         "ctf": 3,
@@ -116,19 +115,24 @@ class RE_1_5_dev(RE):
         "race": 6,
         }
 
-    #Mutators
+    # Mutators
     mutators = {}
-    basemuts = ["multi", "ffa", "coop", "insta", "medieval", "kaboom",
+
+    basemuts = [
+        "multi", "ffa", "coop", "insta", "medieval", "kaboom",
         "duel", "survivor", "classic", "onslaught", "freestyle", "vampire",
-        "resize", "hard", "basic", "gsp"]
+        "resize", "hard", "basic", "gsp"
+    ]
+
     gspmuts = {
         modes["ctf"]: ["quick", "defend", "protect"],
         modes["dac"]: ["quick", "king"],
         modes["bb"]: ["hold", "basket", "attack"],
         modes["race"]: ["timed", "endurance", "gauntlet"],
         modes["dm"]: ["gladiator", "oldschool"],
-        }
+    }
 
-    #Fancy Mode Names
-    modestr = ["Demo", "Editing", "Deathmatch",
-        "CTF", "DAC", "Bomber Ball", "Race"]
+    # Fancy Mode Names
+    modestr = [
+        "Demo", "Editing", "Deathmatch", "CTF", "DAC", "Bomber Ball", "Race"
+    ]
