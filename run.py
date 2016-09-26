@@ -1,6 +1,7 @@
 #! /usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import os
 import sys
 
 from tornado.wsgi import WSGIContainer
@@ -18,8 +19,17 @@ if __name__ == "__main__":
         print("Usage: %s <data directory>" % sys.argv[0])
         sys.exit(1)
 
+    data_dir = sys.argv[1]
+
+    # Validate commandline parameters
+    if not os.path.isdir(data_dir):
+        raise RuntimeError("No such directory: %s" % data_dir)
+
+    if not os.path.isfile(os.path.join(data_dir, "stats.sqlite")):
+        raise RuntimeError("Could not find stats.sqlite in %s" % data_dir)
+
     # Set data_directory variable from arguments.
-    config.data_directory = sys.argv[1]
+    config.data_directory = data_dir
 
     # Create a new Flask app instance and apply the configuration
     app = create_app(config)
