@@ -2,6 +2,7 @@
 
 import math
 from flask import jsonify, request
+from werkzeug.exceptions import NotFound
 from . import app, dbmodels, extmodels
 import config
 
@@ -218,6 +219,46 @@ def api_player_weapons(handle):
 
     resp = jsonify(ret)
 
+    return resp
+
+
+@app.route("/api/player:game:weapons/<string:handle>/<int:gameid>")
+def api_game_player_weapons(handle, gameid):
+    """
+    Return a single game player's weapons.
+    """
+
+    game = dbmodels.Game.query.filter_by(id=gameid).first_or_404()
+
+    if handle not in [p.handle for p in game.players]:
+        raise NotFound
+
+    ret = {}
+    for weapon in extmodels.Weapon.weapon_list():
+        ret[weapon] = extmodels.Weapon.from_game_player(
+            weapon, gameid, handle).to_dict()
+
+    resp = jsonify(ret)
+    return resp
+
+
+@app.route(
+    "/api/player:game:weapons/<string:handle>/<int:gameid>/<string:weapon>")
+def api_game_player_weapon(handle, gameid, weapon):
+    """
+    Return a single game player's weapons.
+    """
+
+    game = dbmodels.Game.query.filter_by(id=gameid).first_or_404()
+
+    if handle not in [p.handle for p in game.players]:
+        raise NotFound
+
+    if weapon not in extmodels.Weapon.weapon_list():
+        raise NotFound
+
+    resp = jsonify(
+        extmodels.Weapon.from_game_player(weapon, gameid, handle).to_dict())
     return resp
 
 

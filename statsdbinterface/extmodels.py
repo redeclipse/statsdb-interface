@@ -253,6 +253,13 @@ class Weapon:
                 GameWeapon.game_id == game))
 
     @staticmethod
+    def from_game_player(weapon, game, player):
+        return Weapon.finish_query(weapon, GameWeapon.query.filter(
+            GameWeapon.weapon == weapon).filter(
+                GameWeapon.game_id == game).filter(
+                GameWeapon.playerhandle == player))
+
+    @staticmethod
     def from_weapon(weapon):
         return Weapon.finish_query(weapon, GameWeapon.query.filter(
             GameWeapon.weapon == weapon))
