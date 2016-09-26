@@ -3,10 +3,22 @@
 from flask import Flask
 
 
-app = Flask(__name__)
+def create_app(config):
+    """
+    Implementation of the app factory pattern.
 
-# Load the rest of the program.
-from . import database  # noqa
+    http://flask.pocoo.org/docs/patterns/appfactories/
 
-# Load the database.
-database.setup_db(app)
+    :return: A Flask WSGI app object
+    :rtype: `flask.Flask`
+    """
+
+    app = Flask(__name__)
+
+    # Load the rest of the program.
+    from . import database  # noqa
+
+    # Load the database.
+    database.setup_db(app)
+
+    return app
