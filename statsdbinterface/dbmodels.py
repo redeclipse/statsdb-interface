@@ -80,6 +80,48 @@ class GameFFARound(db.Model):
         ])
 
 
+class GameWeapon(db.Model):
+    __tablename__ = "game_weapons"
+
+    game_id = db.Column('game',
+                        db.Integer, db.ForeignKey('games.id'),
+                        primary_key=True)
+    game = db.relationship('Game',
+                           backref=db.backref('weapons', lazy='dynamic'))
+    player = db.Column(db.Integer, primary_key=True)
+    playerhandle = db.Column(db.Text)
+    weapon = db.Column(db.Text, primary_key=True)
+
+    timewielded = db.Column(db.Integer)
+    timeloadout = db.Column(db.Integer)
+
+    damage1 = db.Column(db.Integer)
+    frags1 = db.Column(db.Integer)
+    hits1 = db.Column(db.Integer)
+    flakhits1 = db.Column(db.Integer)
+    shots1 = db.Column(db.Integer)
+    flakshots1 = db.Column(db.Integer)
+
+    damage2 = db.Column(db.Integer)
+    frags2 = db.Column(db.Integer)
+    hits2 = db.Column(db.Integer)
+    flakhits2 = db.Column(db.Integer)
+    shots2 = db.Column(db.Integer)
+    flakshots2 = db.Column(db.Integer)
+
+    def __repr__(self):
+        return '<GameWeapon %s from %d (%d)>' % (self.weapon,
+                                                 self.game_id, self.player)
+
+    def to_dict(self):
+        return direct_to_dict(self, [
+            "game_id", "player", "playerhandle", "weapon",
+            "timewielded", "timeloadout",
+            "damage1", "frags1", "hits1", "flakhits1", "shots1", "flakshots1",
+            "damage2", "frags2", "hits2", "flakhits2", "shots2", "flakshots2",
+        ])
+
+
 class Game(db.Model):
     __tablename__ = 'games'
 
