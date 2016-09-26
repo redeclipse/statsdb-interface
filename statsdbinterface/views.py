@@ -11,13 +11,18 @@ import config
 bp = Blueprint(__name__, __name__)
 
 
-# Return a simple Not Found message upon 404.
+# .
 @bp.errorhandler(404)
 def not_found(error=None):
+    """
+    Return a simple "Not Found" message upon 404.
+    """
+
     message = {
         'status': 404,
         'message': 'Not Found',
     }
+
     resp = jsonify(message)
     resp.status_code = 404
     return resp
