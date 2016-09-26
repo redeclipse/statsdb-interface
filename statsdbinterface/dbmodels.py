@@ -3,6 +3,7 @@
 from sqlalchemy import and_
 from .database import db
 from .modelutils import direct_to_dict, list_to_id_dict
+from . import redeclipse
 
 
 class GameBombing(db.Model):
@@ -151,6 +152,13 @@ class Game(db.Model):
                 ffarounds[index]["winner"] = ffaround.player
             ffarounds[index]["players"].append(ffaround.player)
         return ffarounds
+
+    def full_weapons(self):
+        from .extmodels import Weapon
+        ret = {}
+        for weapon in redeclipse.versions.default.weaponlist:
+            ret[weapon] = Weapon.from_game(weapon, self.id)
+        return ret
 
     def to_dict(self):
         return direct_to_dict(

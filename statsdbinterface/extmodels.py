@@ -2,8 +2,9 @@
 
 from werkzeug.exceptions import NotFound
 from .database import db
-from .dbmodels import Game, GamePlayer, GameServer
+from .dbmodels import Game, GamePlayer, GameServer, GameWeapon
 from .modelutils import direct_to_dict
+from . import redeclipse
 
 import config
 
@@ -54,6 +55,12 @@ class Player:
         ids = (self.game_ids[page * pagesize:page * pagesize + pagesize]
                if pagesize is not None else self.game_ids)
         return Game.query.filter(Game.id.in_(ids)).all()
+
+    def weapons(self):
+        ret = {}
+        for weapon in redeclipse.versions.default.weaponlist:
+            ret[weapon] = Weapon.from_player(weapon, self.handle)
+        return ret
 
     def to_dict(self):
         return direct_to_dict(self, [
@@ -130,8 +137,8 @@ class Map:
     @staticmethod
     def get_or_404(name):
         # Return a Map for <name> if <name> exists, otherwise 404.
-        handles = Map.map_list()
-        if name in handles:
+        names = Map.map_list()
+        if name in names:
             return Map(name)
         else:
             raise NotFound
@@ -202,3 +209,70 @@ class Map:
         ], {
             "topraces": self.topraces(),
         })
+
+
+class Weapon:
+
+    columns = ["timewielded", "timeloadout",
+               "damage1", "frags1", "hits1", "flakhits1",
+               "shots1", "flakshots1",
+               "damage2", "frags2", "hits2", "flakhits2",
+               "shots2", "flakshots2",
+               ]
+
+    @staticmethod
+    def weapon_list():
+        # Return a list of all default weapon names.
+        return redeclipse.versions.default.weaponlist
+
+    @staticmethod
+    def count():
+        # Return the number of default weapons.
+        return len(Weapon.weapon_list())
+
+    @staticmethod
+    def finish_query(name, query):
+        weapon = Weapon(name)
+        qret = query.with_entities(*[
+            db.func.sum(getattr(GameWeapon, c))
+            for c in Weapon.columns]).all()[0]
+        for c in Weapon.columns:
+            setattr(weapon, c, qret[Weapon.columns.index(c)])
+        return weapon
+
+    @staticmethod
+    def from_player(weapon, player):
+        return Weapon.finish_query(weapon, GameWeapon.query.filter(
+            GameWeapon.weapon == weapon).filter(
+                GameWeapon.playerhandle == player))
+
+    @staticmethod
+    def from_game(weapon, game):
+        return Weapon.finish_query(weapon, GameWeapon.query.filter(
+            GameWeapon.weapon == weapon).filter(
+                GameWeapon.game_id == game))
+
+    @staticmethod
+    def from_weapon(weapon):
+        return Weapon.finish_query(weapon, GameWeapon.query.filter(
+            GameWeapon.weapon == weapon))
+
+    @staticmethod
+    def get_or_404(name):
+        names = Weapon.weapon_list()
+        if name in names:
+            return Weapon.from_weapon(name)
+        else:
+            raise NotFound
+
+    @staticmethod
+    def all():
+        return [Weapon.from_weapon(n) for n in Weapon.weapon_list()]
+
+    def __init__(self, name):
+        self.name = name
+
+    def to_dict(self):
+        return direct_to_dict(self, [
+            "name"
+        ] + Weapon.columns)

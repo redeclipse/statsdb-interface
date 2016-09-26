@@ -136,3 +136,5 @@ class RE_1_5_dev(RE):
     modestr = [
         "Demo", "Editing", "Deathmatch", "CTF", "DAC", "Bomber Ball", "Race"
     ]
+
+default = get_version_class(DEFAULT_VERSION)

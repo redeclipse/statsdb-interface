@@ -133,6 +133,24 @@ def api_game(gameid):
     return resp
 
 
+@app.route("/api/game:weapons/<int:gameid>")
+def api_game_weapons(gameid):
+    """
+    Return a single games's weapons.
+    """
+
+    game = dbmodels.Game.query.filter_by(id=gameid).first_or_404()
+
+    ret = {}
+    weapons = game.full_weapons()
+    for w in weapons:
+        ret[w] = weapons[w].to_dict()
+
+    resp = jsonify(ret)
+
+    return resp
+
+
 @app.route("/api/players")
 def api_players():
     """
@@ -181,6 +199,24 @@ def api_player_games(handle):
             page=page, pagesize=config.API_RESULTS_PER_PAGE
         )
     ])
+
+    return resp
+
+
+@app.route("/api/player:weapons/<string:handle>")
+def api_player_weapons(handle):
+    """
+    Return a single player's weapons.
+    """
+
+    player = extmodels.Player.get_or_404(handle)
+
+    ret = {}
+    weapons = player.weapons()
+    for w in weapons:
+        ret[w] = weapons[w].to_dict()
+
+    resp = jsonify(ret)
 
     return resp
 
@@ -293,4 +329,20 @@ def api_map_games(name):
         }
     )
 
+    return resp
+
+
+@app.route("/api/weapons")
+def api_weapons():
+    ret = {}
+    for weapon in extmodels.Weapon.all():
+        ret[weapon.name] = weapon.to_dict()
+    resp = jsonify(ret)
+    return resp
+
+
+@app.route("/api/weapons/<string:name>")
+def api_weapon(name):
+    weapon = extmodels.Weapon.get_or_404(name)
+    resp = jsonify(weapon.to_dict())
     return resp
