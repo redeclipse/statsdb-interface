@@ -22,4 +22,8 @@ def create_app(config):
     # Load the database.
     database.setup_db(app)
 
+    # Register views
+    from .views import bp
+    app.register_blueprint(bp)
+
     return app
