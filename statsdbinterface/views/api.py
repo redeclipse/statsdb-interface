@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
 
 import math
-from flask import jsonify, request, Blueprint
 from werkzeug.exceptions import NotFound
-from . import dbmodels, extmodels
+from flask import jsonify, request, Blueprint
+from .. import dbmodels, extmodels
 import config
 
 
-# app's main blueprint
-bp = Blueprint(__name__, __name__)
+# api blueprint
+bp = Blueprint(__name__, __name__, url_prefix='/api')
 
 
 # .
@@ -28,7 +28,7 @@ def not_found(error=None):
     return resp
 
 
-@bp.route("/api/config")
+@bp.route("/config")
 def api_config():
     """
     Return configuration information.
@@ -40,7 +40,7 @@ def api_config():
     })
 
 
-@bp.route("/api/count/games")
+@bp.route("/count/games")
 def api_count_games():
     """
     The /count/ functions return rows and pages for the lists.
@@ -53,7 +53,7 @@ def api_count_games():
     })
 
 
-@bp.route("/api/count/players")
+@bp.route("/count/players")
 def api_count_players():
     rowcount = extmodels.Player.count()
     return jsonify({
@@ -62,7 +62,7 @@ def api_count_players():
     })
 
 
-@bp.route("/api/count/player:games/<string:handle>")
+@bp.route("/count/player:games/<string:handle>")
 def api_count_player_games(handle):
     player = extmodels.Player.get_or_404(handle)
     rowcount = len(player.game_ids)
@@ -72,7 +72,7 @@ def api_count_player_games(handle):
     })
 
 
-@bp.route("/api/count/servers")
+@bp.route("/count/servers")
 def api_count_servers():
     rowcount = extmodels.Server.count()
     return jsonify({
@@ -81,7 +81,7 @@ def api_count_servers():
     })
 
 
-@bp.route("/api/count/server:games/<string:handle>")
+@bp.route("/count/server:games/<string:handle>")
 def api_count_server_games(handle):
     server = extmodels.Server.get_or_404(handle)
     rowcount = len(server.game_ids)
@@ -91,7 +91,7 @@ def api_count_server_games(handle):
     })
 
 
-@bp.route("/api/count/maps")
+@bp.route("/count/maps")
 def api_count_maps():
     rowcount = extmodels.Map.count()
     return jsonify({
@@ -100,7 +100,7 @@ def api_count_maps():
     })
 
 
-@bp.route("/api/count/map:games/<string:name>")
+@bp.route("/count/map:games/<string:name>")
 def api_count_map_games(name):
     map_ = extmodels.Map.get_or_404(name)
     rowcount = len(map_.game_ids)
@@ -110,7 +110,7 @@ def api_count_map_games(name):
     })
 
 
-@bp.route("/api/games")
+@bp.route("/games")
 def api_games():
     """
     Return a list of games.
@@ -143,7 +143,7 @@ def api_game(gameid):
     return resp
 
 
-@bp.route("/api/game:weapons/<int:gameid>")
+@bp.route("/game:weapons/<int:gameid>")
 def api_game_weapons(gameid):
     """
     Return a single games's weapons.
@@ -161,7 +161,7 @@ def api_game_weapons(gameid):
     return resp
 
 
-@bp.route("/api/players")
+@bp.route("/players")
 def api_players():
     """
     Return a list of players.
@@ -182,7 +182,7 @@ def api_players():
     return resp
 
 
-@bp.route("/api/players/<string:handle>")
+@bp.route("/players/<string:handle>")
 def api_player(handle):
     """
     Return a single player.
@@ -193,7 +193,7 @@ def api_player(handle):
     return resp
 
 
-@bp.route("/api/player:games/<string:handle>")
+@bp.route("/player:games/<string:handle>")
 def api_player_games(handle):
     """
     Return a single player's games.
@@ -213,7 +213,7 @@ def api_player_games(handle):
     return resp
 
 
-@bp.route("/api/player:weapons/<string:handle>")
+@bp.route("/player:weapons/<string:handle>")
 def api_player_weapons(handle):
     """
     Return a single player's weapons.
@@ -231,7 +231,7 @@ def api_player_weapons(handle):
     return resp
 
 
-@bp.route("/api/player:game:weapons/<string:handle>/<int:gameid>")
+@bp.route("/player:game:weapons/<string:handle>/<int:gameid>")
 def api_game_player_weapons(handle, gameid):
     """
     Return a single game player's weapons.
@@ -252,7 +252,7 @@ def api_game_player_weapons(handle, gameid):
 
 
 @bp.route(
-    "/api/player:game:weapons/<string:handle>/<int:gameid>/<string:weapon>")
+    "/player:game:weapons/<string:handle>/<int:gameid>/<string:weapon>")
 def api_game_player_weapon(handle, gameid, weapon):
     """
     Return a single game player's weapons.
@@ -271,7 +271,7 @@ def api_game_player_weapon(handle, gameid, weapon):
     return resp
 
 
-@bp.route("/api/servers")
+@bp.route("/servers")
 def api_servers():
     """
     Return a list of servers.
@@ -295,7 +295,7 @@ def api_servers():
     return resp
 
 
-@bp.route("/api/servers/<string:handle>")
+@bp.route("/servers/<string:handle>")
 def api_server(handle):
     """
     Return a single server.
@@ -307,7 +307,7 @@ def api_server(handle):
     return resp
 
 
-@bp.route("/api/server:games/<string:handle>")
+@bp.route("/server:games/<string:handle>")
 def api_server_games(handle):
     """
     Return a single server's games.
@@ -326,7 +326,7 @@ def api_server_games(handle):
     return resp
 
 
-@bp.route("/api/maps")
+@bp.route("/maps")
 def api_maps():
     """
     Return a list of maps.
@@ -349,7 +349,7 @@ def api_maps():
     return resp
 
 
-@bp.route("/api/maps/<string:name>")
+@bp.route("/maps/<string:name>")
 def api_map(name):
     """
     Return a single map.
@@ -360,7 +360,7 @@ def api_map(name):
     return resp
 
 
-@bp.route("/api/map:games/<string:name>")
+@bp.route("/map:games/<string:name>")
 def api_map_games(name):
     """
     Return a single map's games.
@@ -382,7 +382,7 @@ def api_map_games(name):
     return resp
 
 
-@bp.route("/api/weapons")
+@bp.route("/weapons")
 def api_weapons():
     ret = {}
     for weapon in extmodels.Weapon.all():
@@ -391,7 +391,7 @@ def api_weapons():
     return resp
 
 
-@bp.route("/api/weapons/<string:name>")
+@bp.route("/weapons/<string:name>")
 def api_weapon(name):
     weapon = extmodels.Weapon.get_or_404(name)
     resp = jsonify(weapon.to_dict())

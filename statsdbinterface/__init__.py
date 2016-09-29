@@ -23,7 +23,8 @@ def create_app(config):
     database.setup_db(app)
 
     # Register views
-    from .views import bp
-    app.register_blueprint(bp)
+    from .views import api, displays
+    app.register_blueprint(api.bp)
+    app.register_blueprint(displays.bp)
 
     return app
