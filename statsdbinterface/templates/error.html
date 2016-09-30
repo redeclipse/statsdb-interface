@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% set current_display = "error" %}
+
+{% block title %}{{ error }}{% endblock title %}
+
+{% block content %}
+    <div class="centering text-center">
+        <h1>{{ error }}</h1>
+    </div>
+{% endblock content %}

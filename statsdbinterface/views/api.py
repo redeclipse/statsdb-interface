@@ -27,6 +27,21 @@ def not_found(error=None):
     return resp
 
 
+def internal_error(error=None):
+    """
+    Return a simple "Internal Error" message upon 500.
+    """
+
+    message = {
+        'status': 500,
+        'message': 'Internal Error',
+    }
+
+    resp = jsonify(message)
+    resp.status_code = 500
+    return resp
+
+
 @bp.route("/config")
 def api_config():
     """
