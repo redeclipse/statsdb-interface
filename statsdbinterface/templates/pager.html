@@ -1,0 +1,33 @@
+<ul class="pager">
+    <li class="{% if pages.current == 0 %}disabled {% endif %}previous">
+        {% if pages.current > 0 %}
+            <a href="{{ request.path }}?page=0">First</a>
+        {% else %}
+            <a>First</a>
+        {% endif %}
+    </li>
+
+    <li class="{% if pages.current == 0 %}disabled {% endif %}previous">
+        {% if pages.current > 0 %}
+            <a href="{{ request.path }}?page={{ pages.previous() }}">Previous</a>
+        {% else %}
+            <a>Previous</a>
+        {% endif %}
+    </li>
+
+    <li class="{% if pages.current >= pages.last_page() %}disabled {% endif %}next">
+        {% if pages.current < pages.last_page() %}
+            <a href="{{ request.path }}?page={{ pages.last_page() }}">Last</a>
+        {% else %}
+            <a>Last</a>
+        {% endif %}
+    </li>
+
+    <li class="{% if pages.current >= pages.last_page() %}disabled {% endif %}next">
+        {% if pages.current < pages.last_page() %}
+            <a href="{{ request.path }}?page={{ pages.next() }}">Next</a>
+        {% else %}
+            <a>Next</a>
+        {% endif %}
+    </li>
+</ul>

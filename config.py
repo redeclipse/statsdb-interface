@@ -17,7 +17,7 @@ API_RESULTS_PER_PAGE = 25
 API_HIGHSCORE_RESULTS = 10
 
 # Number of results to return in a display list page.
-DISPLAY_RESULTS_PER_PAGE = 20
+DISPLAY_RESULTS_PER_PAGE = 15
 
 
 # These are set in other parts of the program.

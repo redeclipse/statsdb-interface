@@ -38,6 +38,9 @@
             <div>
                 {% block content %}
                 {% endblock content %}
+                {% if pages is defined %}
+                {% include "pager.html" %}
+                {% endif %}
             </div>
         </div>
 
