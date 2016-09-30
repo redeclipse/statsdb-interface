@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import math
-from werkzeug.exceptions import NotFound
-from flask import jsonify, request, Blueprint
+from flask import jsonify, request, Blueprint, abort
 from .. import dbmodels, extmodels
 import config
 
@@ -117,13 +116,10 @@ def api_games():
     Return a list of games.
     """
 
-    # Get the page number.
-    page = request.args.get("page", default=0, type=int)
-
     # Get a list of games sorted by id and offset by the page.
-    games = dbmodels.Game.query.order_by(dbmodels.Game.id).limit(
-        config.API_RESULTS_PER_PAGE).offset(
-        config.API_RESULTS_PER_PAGE * page).all()
+    games = dbmodels.Game.query.order_by(dbmodels.Game.id).paginate(
+        request.args.get("page", default=1, type=int),
+        config.API_RESULTS_PER_PAGE).items
 
     # Return the list via json.
     ret = []
@@ -168,12 +164,10 @@ def api_players():
     Return a list of players.
     """
 
-    # Get the page number.
-    page = request.args.get("page", default=0, type=int)
-
     # Get the player list.
-    players = extmodels.Player.all(page=page,
-                                   pagesize=config.API_RESULTS_PER_PAGE)
+    players = extmodels.Player.paginate(
+        request.args.get("page", default=1, type=int),
+        config.API_RESULTS_PER_PAGE).items
 
     # Return the list via json.
     ret = []
@@ -200,15 +194,12 @@ def api_player_games(handle):
     Return a single player's games.
     """
 
-    # Get the page number.
-    page = request.args.get("page", default=0, type=int)
-
     player = extmodels.Player.get_or_404(handle)
 
     resp = jsonify(games=[
-        g.to_dict() for g in player.games(
-            page=page, pagesize=config.API_RESULTS_PER_PAGE
-        )
+        g.to_dict() for g in player.games_paginate(
+            request.args.get("page", default=1, type=int),
+            config.API_RESULTS_PER_PAGE).items
     ])
 
     return resp
@@ -241,7 +232,7 @@ def api_game_player_weapons(handle, gameid):
     game = dbmodels.Game.query.filter_by(id=gameid).first_or_404()
 
     if handle not in [p.handle for p in game.players]:
-        raise NotFound
+        abort(404)
 
     ret = {}
     for weapon in extmodels.Weapon.weapon_list():
@@ -262,10 +253,10 @@ def api_game_player_weapon(handle, gameid, weapon):
     game = dbmodels.Game.query.filter_by(id=gameid).first_or_404()
 
     if handle not in [p.handle for p in game.players]:
-        raise NotFound
+        abort(404)
 
     if weapon not in extmodels.Weapon.weapon_list():
-        raise NotFound
+        abort(404)
 
     resp = jsonify(
         extmodels.Weapon.from_game_player(weapon, gameid, handle).to_dict())
@@ -278,12 +269,10 @@ def api_servers():
     Return a list of servers.
     """
 
-    # Get the page number.
-    page = request.args.get("page", default=0, type=int)
-
-    # Get the player list.
-    servers = extmodels.Server.all(page=page,
-                                   pagesize=config.API_RESULTS_PER_PAGE)
+    # Get the server list.
+    servers = extmodels.Server.paginate(
+        request.args.get("page", default=1, type=int),
+        config.API_RESULTS_PER_PAGE).items
 
     # Return the list via json.
     ret = []
@@ -314,14 +303,13 @@ def api_server_games(handle):
     Return a single server's games.
     """
 
-    # Get the page number.
-    page = request.args.get("page", default=0, type=int)
-
     server = extmodels.Server.get_or_404(handle)
 
     resp = jsonify(games=[
         g.to_dict() for g in
-        server.games(page=page, pagesize=config.API_RESULTS_PER_PAGE)
+        server.games_paginate(
+            request.args.get("page", default=1, type=int),
+            config.API_RESULTS_PER_PAGE).items
     ])
 
     return resp
@@ -333,11 +321,10 @@ def api_maps():
     Return a list of maps.
     """
 
-    # Get the page number.
-    page = request.args.get("page", default=0, type=int)
-
-    # Get the player list.
-    maps = extmodels.Map.all(page=page, pagesize=config.API_RESULTS_PER_PAGE)
+    # Get the map list.
+    maps = extmodels.Map.paginate(
+        request.args.get("page", default=1, type=int),
+        config.API_RESULTS_PER_PAGE).items
 
     # Return the list via json.
     ret = []
@@ -367,16 +354,14 @@ def api_map_games(name):
     Return a single map's games.
     """
 
-    # Get the page number.
-    page = request.args.get("page", default=0, type=int)
-
     map_ = extmodels.Map.get_or_404(name)
 
     resp = jsonify(
         {
-            "games": [g.to_dict() for g in map_.games(
-                page=page, pagesize=config.API_RESULTS_PER_PAGE
-            )]
+            "games": [g.to_dict() for g in map_.games_paginate(
+                request.args.get("page", default=1, type=int),
+                config.API_RESULTS_PER_PAGE).items
+            ]
         }
     )
 

@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
-from werkzeug.exceptions import NotFound
+from flask import abort
 from .database import db
 from .dbmodels import Game, GamePlayer, GameServer, GameWeapon
-from .modelutils import direct_to_dict
+from .modelutils import direct_to_dict, to_pagination
 from . import redeclipse
 
 import config
@@ -30,7 +30,7 @@ class Player:
         if handle in handles:
             return Player(handle)
         else:
-            raise NotFound
+            abort(404)
 
     @staticmethod
     def all(page=0, pagesize=None):
@@ -41,6 +41,10 @@ class Player:
             filtered_handles = handles[
                 page * pagesize:page * pagesize + pagesize]
         return [Player(handle) for handle in filtered_handles]
+
+    @classmethod
+    def paginate(cls, page, per_page):
+        return to_pagination(page, per_page, cls.all, cls.count)
 
     def __init__(self, handle):
         # Build a Player object from the database.
@@ -54,7 +58,13 @@ class Player:
         # Return full Game objects from Player's game_ids.
         ids = (self.game_ids[page * pagesize:page * pagesize + pagesize]
                if pagesize is not None else self.game_ids)
+        if not ids:
+            return []
         return Game.query.filter(Game.id.in_(ids)).all()
+
+    def games_paginate(self, page, per_page):
+        return to_pagination(page, per_page, self.games,
+                             lambda: len(self.game_ids))
 
     def weapons(self):
         ret = {}
@@ -90,8 +100,9 @@ class Server:
         if handle in handles:
             return Server(handle)
         else:
-            raise NotFound
+            abort(404)
 
+    @staticmethod
     def all(page=0, pagesize=None):
         # Return all servers, with optional paging.
         filtered_handles = handles = Server.handle_list()
@@ -100,6 +111,10 @@ class Server:
             filtered_handles = handles[
                 page * pagesize:page * pagesize + pagesize]
         return [Server(handle) for handle in filtered_handles]
+
+    @classmethod
+    def paginate(cls, page, per_page):
+        return to_pagination(page, per_page, cls.all, cls.count)
 
     def __init__(self, handle):
         # Build a Server object from the database.
@@ -114,7 +129,13 @@ class Server:
         ids = (self.game_ids[page * pagesize:page * pagesize + pagesize]
                if pagesize is not None else
                self.game_ids)
+        if not ids:
+            return []
         return Game.query.filter(Game.id.in_(ids)).all()
+
+    def games_paginate(self, page, per_page):
+        return to_pagination(page, per_page, self.games,
+                             lambda: len(self.game_ids))
 
     def to_dict(self):
         return direct_to_dict(self, [
@@ -141,7 +162,7 @@ class Map:
         if name in names:
             return Map(name)
         else:
-            raise NotFound
+            abort(404)
 
     def all(page=0, pagesize=None):
         # Return all m, with optional paging.
@@ -152,11 +173,15 @@ class Map:
                 page * pagesize:page * pagesize + pagesize]
         return [Map(name) for name in filtered_names]
 
+    @classmethod
+    def paginate(cls, page, per_page):
+        return to_pagination(page, per_page, cls.all, cls.count)
+
     def __init__(self, name):
         # Build a Map object from the database.
         self.name = name
         self.game_ids = [
-            [0] for r in
+            r[0] for r in
             Game.query.with_entities(Game.id).filter(
                 Game.map == self.name
             ).all()
@@ -167,7 +192,13 @@ class Map:
         ids = (self.game_ids[page * pagesize:page * pagesize + pagesize]
                if pagesize is not None else
                self.game_ids)
+        if not ids:
+            return []
         return Game.query.filter(Game.id.in_(ids)).all()
+
+    def games_paginate(self, page, per_page):
+        return to_pagination(page, per_page, self.games,
+                             lambda: len(self.game_ids))
 
     def topraces(self):
         # Return a dictionary of the top race times.
@@ -270,7 +301,7 @@ class Weapon:
         if name in names:
             return Weapon.from_weapon(name)
         else:
-            raise NotFound
+            abort(404)
 
     @staticmethod
     def all():

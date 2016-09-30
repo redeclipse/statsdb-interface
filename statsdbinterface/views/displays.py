@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from flask import Blueprint, render_template, send_from_directory, request
 from .. import dbmodels
-from .utils import Pages
 import config
 
 
@@ -27,15 +26,12 @@ def display_dashboard():
 
 @bp.route("/games")
 def display_games():
-    page = request.args.get("page", default=0, type=int)
-    pages = Pages(page, config.DISPLAY_RESULTS_PER_PAGE,
-                  dbmodels.Game.query.count())
+    pager = dbmodels.Game.query.order_by(dbmodels.Game.id.desc()).paginate(
+            request.args.get("page", default=1, type=int),
+            config.DISPLAY_RESULTS_PER_PAGE)
 
-    games = dbmodels.Game.query.order_by(dbmodels.Game.id.desc()).limit(
-        pages.size).offset(
-        pages.size * page).all()
-
-    return render_template('displays/games.html', games=games, pages=pages)
+    return render_template('displays/games.html',
+                           games=pager.items, pager=pager)
 
 
 @bp.route("/games/<int:gameid>")

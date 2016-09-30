@@ -1,31 +1,15 @@
 <ul class="pager">
-    <li class="{% if pages.current == 0 %}disabled {% endif %}previous">
-        {% if pages.current > 0 %}
-            <a href="{{ request.path }}?page=0">First</a>
-        {% else %}
-            <a>First</a>
-        {% endif %}
-    </li>
-
-    <li class="{% if pages.current == 0 %}disabled {% endif %}previous">
-        {% if pages.current > 0 %}
-            <a href="{{ request.path }}?page={{ pages.previous() }}">Previous</a>
+    <li class="{% if not pager.has_prev %}disabled {% endif %}previous">
+        {% if pager.has_prev %}
+            <a href="{{ request.path }}?page={{ pager.prev_num }}">Previous</a>
         {% else %}
             <a>Previous</a>
         {% endif %}
     </li>
 
-    <li class="{% if pages.current >= pages.last_page() %}disabled {% endif %}next">
-        {% if pages.current < pages.last_page() %}
-            <a href="{{ request.path }}?page={{ pages.last_page() }}">Last</a>
-        {% else %}
-            <a>Last</a>
-        {% endif %}
-    </li>
-
-    <li class="{% if pages.current >= pages.last_page() %}disabled {% endif %}next">
-        {% if pages.current < pages.last_page() %}
-            <a href="{{ request.path }}?page={{ pages.next() }}">Next</a>
+    <li class="{% if not pager.has_next %}disabled {% endif %}next">
+        {% if pager.has_next %}
+            <a href="{{ request.path }}?page={{ pager.next_num }}">Next</a>
         {% else %}
             <a>Next</a>
         {% endif %}

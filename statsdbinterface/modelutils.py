@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from flask import abort
+from flask_sqlalchemy import Pagination
 
 
 def direct_to_dict(base, attributes, update=None):
@@ -33,3 +35,16 @@ def list_to_id_dict(base, attribute):
         ret[d[attribute]] = d
 
     return ret
+
+
+def to_pagination(page, per_page, page_function, count_function):
+    if page < 1 or per_page < 1:
+        abort(404)
+    items = page_function(page - 1, per_page)
+    if not items and page != 1:
+        abort(404)
+    if page == 1 and len(items) < per_page:
+        total = len(items)
+    else:
+        total = count_function()
+    return Pagination(None, page, per_page, total, items)
