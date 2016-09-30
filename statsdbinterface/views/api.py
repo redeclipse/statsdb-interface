@@ -37,6 +37,7 @@ def api_config():
     return jsonify({
         "api_results_per_page": config.API_RESULTS_PER_PAGE,
         "api_highscore_results": config.API_HIGHSCORE_RESULTS,
+        "display_results_per_page": config.DISPLAY_RESULTS_PER_PAGE,
     })
 
 

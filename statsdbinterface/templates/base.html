@@ -13,10 +13,11 @@
     <body>
         {% block body %}
         {% block navigation %}
+        {% set current_display = current_display -%}
         {% include "navigation.html" %}
         {% endblock navigation %}
 
-        <div class="{% block container_type %}container{% endblock %}" style="margin-top: 75px;">
+        <div class="{% block container_type %}container{% endblock %}">
             {% block messages %}
             {% with messages = get_flashed_messages(with_categories=True) %}
                 {% if messages %}

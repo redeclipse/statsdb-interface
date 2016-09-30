@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% set current_display = "games" %}
+
+{% block title %}Games{% endblock title %}
+
+{% block content %}
+    <table class="table table-hover">
+        <thead>
+            <th>Game</th>
+            <th>Map</th>
+            <th>Mode</th>
+            <th>Server</th>
+            <th>When</th>
+            <th>Length</th>
+        </thead>
+        <tbody>
+            {% for game in games %}
+                <tr>
+                    <td><a href="{{ url_for('.display_game', gameid=game.id) }}">{{ game.id }}</a></td>
+                    <td>{{ game.map }}</td>
+                    <td>{{ game.mode }}{% if game.mutators != 0 %} {{ game.mutators }}{% endif %}</td>
+                    <td>{{ game.server.first().handle }}</td>
+                    <td>{{ game.time }}</td>
+                    <td>{{ game.timeplayed }}</td>
+                <tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock content %}

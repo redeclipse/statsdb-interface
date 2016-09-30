@@ -7,7 +7,7 @@ setup(
     name="statsdbinterface",
     version="2.0.0-alpha",
     description="Red Eclipse statistics database interface",
-    url="https://github.com/red-eclipse/statsdb-interface-2",
+    url="https://github.com/red-eclipse/statsdb-interface",
     author="Beha",
     author_email="shacknetisp@users.noreply.github.com",
     packages=find_packages(),
