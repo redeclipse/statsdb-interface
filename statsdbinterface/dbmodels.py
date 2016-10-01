@@ -160,27 +160,25 @@ class Game(db.Model):
             ret[weapon] = Weapon.from_game(weapon, self.id)
         return ret
 
+    def re(self):
+        return redeclipse.versions.get_game_version(self.id)
+
     def is_timed(self):
-        re = redeclipse.versions.get_game_version(self.id)
-        return self.mode == re.modes['race'] and 'timed' in re.mutslist(
-            self.mode, self.mutators)
+        return (self.mode == self.re().modes['race'] and
+                'timed' in self.re().mutslist(self.mode, self.mutators))
 
     def is_peaceful(self):
-        re = redeclipse.versions.get_game_version(self.id)
-        if self.mode == re.modes['race'] and 'gauntlet' not in re.mutslist(
-                self.mode, self.mutators):
-                    return True
-        return False
+        return (self.mode == self.re().modes['race'] and
+                'gauntlet' not in self.re().mutslist(self.mode, self.mutators))
 
     def mode_str(self, short=False):
-        re = redeclipse.versions.get_game_version(self.id)
-        return re.cmodestr[self.mode] if short else re.modestr[self.mode]
+        return (self.re().cmodestr[self.mode] if short else
+                self.re().modestr[self.mode])
 
     def mutator_list(self, maxlong=0):
-        re = redeclipse.versions.get_game_version(self.id)
-        return re.mutslist(self.mode, self.mutators,
-                           (maxlong and len(re.mutslist(
-                            self.mode, self.mutators)) > maxlong))
+        return self.re().mutslist(self.mode, self.mutators,
+                                  (maxlong and len(self.re().mutslist(
+                                   self.mode, self.mutators)) > maxlong))
 
     def ordered_players(self):
         if self.is_timed():

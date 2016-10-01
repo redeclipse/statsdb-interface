@@ -10,6 +10,7 @@
             <th>Server</th>
             <th>When</th>
             <th>Length</th>
+            <th>Players</th>
         </tr>
     </thead>
     <tbody>
@@ -21,6 +22,7 @@
                 <td>{{ game.server.first().handle }}</td>
                 <td>{{ timeutils.ago(game.time) }}</td>
                 <td>{{ timeutils.span(game.timeplayed) }}</td>
+                <td>{{ game.players.count() }}</td>
             <tr>
         {% endfor %}
     </tbody>
