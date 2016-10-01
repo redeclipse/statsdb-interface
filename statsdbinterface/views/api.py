@@ -10,38 +10,6 @@ import config
 bp = Blueprint(__name__, __name__, url_prefix='/api')
 
 
-# .
-@bp.errorhandler(404)
-def not_found(error=None):
-    """
-    Return a simple "Not Found" message upon 404.
-    """
-
-    message = {
-        'status': 404,
-        'message': 'Not Found',
-    }
-
-    resp = jsonify(message)
-    resp.status_code = 404
-    return resp
-
-
-def internal_error(error=None):
-    """
-    Return a simple "Internal Error" message upon 500.
-    """
-
-    message = {
-        'status': 500,
-        'message': 'Internal Error',
-    }
-
-    resp = jsonify(message)
-    resp.status_code = 500
-    return resp
-
-
 @bp.route("/config")
 def api_config():
     """

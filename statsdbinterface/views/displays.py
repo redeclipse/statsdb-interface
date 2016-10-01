@@ -1,21 +1,12 @@
 # -*- coding: utf-8 -*-
-from flask import Blueprint, render_template, send_from_directory, request
-from .. import dbmodels
 import config
+from flask import Blueprint, render_template, send_from_directory, request
+
+from .. import dbmodels
 
 
 # displays blueprint
 bp = Blueprint(__name__, __name__)
-
-
-# .
-@bp.errorhandler(404)
-def not_found(error=None):
-    return render_template("error.html", error="404 Not Found"), 404
-
-
-def internal_error(error=None):
-    return render_template("error.html", error="500 Internal Error"), 500
 
 
 @bp.route('/static/<path:path>')

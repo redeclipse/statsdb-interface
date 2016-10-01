@@ -27,19 +27,8 @@ def create_app(config):
     app.register_blueprint(api.bp)
     app.register_blueprint(displays.bp)
 
-    # Dispatch error handlers correctly.
-    @app.errorhandler(404)
-    def not_found(error=None):
-        if request.path.lstrip("/").split("/")[0] == "api":
-            return api.not_found(error)
-        else:
-            return displays.not_found(error)
-
-    @app.errorhandler(500)
-    def internal_error(error=None):
-        if request.path.lstrip("/").split("/")[0] == "api":
-            return api.internal_error(error)
-        else:
-            return displays.internal_error(error)
+    # set up error handling
+    from .error_handling import setup_app
+    setup_app(app)
 
     return app
