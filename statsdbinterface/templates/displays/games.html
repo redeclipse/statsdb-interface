@@ -9,8 +9,8 @@
         <thead>
             <tr>
                 <th>Game</th>
-                <th>Map</th>
                 <th>Mode</th>
+                <th>Map</th>
                 <th>Server</th>
                 <th>When</th>
                 <th>Length</th>
@@ -20,11 +20,11 @@
             {% for game in games %}
                 <tr>
                     <td><a href="{{ url_for('.display_game', gameid=game.id) }}">{{ game.id }}</a></td>
-                    <td>{{ game.map }}</td>
                     <td>{{ game.mode }}{% if game.mutators != 0 %} {{ game.mutators }}{% endif %}</td>
+                    <td>{{ game.map }}</td>
                     <td>{{ game.server.first().handle }}</td>
                     <td>{{ timeutils.ago(game.time) }}</td>
-                    <td>{{ game.timeplayed }}</td>
+                    <td>{{ timeutils.span(game.timeplayed) }}</td>
                 <tr>
             {% endfor %}
         </tbody>

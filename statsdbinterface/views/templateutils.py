@@ -9,12 +9,10 @@ def timestr(epoch_time, output_format="%F %T %Z"):
     return time.strftime(output_format, time.gmtime(epoch_time))
 
 
-def timeago(epoch_time, short=False):
+def duration_str(difference, short=False, exact=False):
     """
-    Return time elapsed since epoch_time
+    Return difference as a human-readable string.
     """
-    difference = time.time() - epoch_time
-
     # <sconds>, <long name>, <short name>, <maximum before rounding>
     levels = [
         (60 * 60 * 24 * 365.25, "year", "y", 0),
@@ -31,7 +29,7 @@ def timeago(epoch_time, short=False):
     for seconds, long_name, short_name, maximum in levels:
         of_this = remaining // seconds
         remaining = remaining % seconds
-        if maximum and difference / seconds > maximum:
+        if not exact and maximum and difference / seconds > maximum:
             break
         if of_this > 0:
             rounded = round(of_this)
@@ -41,3 +39,12 @@ def timeago(epoch_time, short=False):
                 rounded, short_name if short else (" " + formatted_long_name))
 
     return (ret or ('0' + (levels[-1][3] if short else levels[-1][2]))).strip()
+
+
+def timeago(epoch_time, short=False):
+    """
+    Return time elapsed since epoch_time
+    """
+    difference = time.time() - epoch_time
+
+    return duration_str(difference, short=short)
