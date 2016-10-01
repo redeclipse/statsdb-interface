@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% import 'utils/redeclipse.html' as redeclipse %}
 {% import 'utils/time.html' as timeutils with context %}
 {% set current_display = "games" %}
 
@@ -20,7 +21,7 @@
             {% for game in games %}
                 <tr>
                     <td><a href="{{ url_for('.display_game', gameid=game.id) }}">{{ game.id }}</a></td>
-                    <td>{{ game.mode }}{% if game.mutators != 0 %} {{ game.mutators }}{% endif %}</td>
+                    <td>{{ redeclipse.fancy_mode(game) }}{% if game.mutators != 0 %} {{ redeclipse.fancy_mutators(game) }}{% endif %}</td>
                     <td>{{ game.map }}</td>
                     <td>{{ game.server.first().handle }}</td>
                     <td>{{ timeutils.ago(game.time) }}</td>

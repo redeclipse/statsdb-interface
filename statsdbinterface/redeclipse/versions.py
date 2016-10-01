@@ -70,10 +70,20 @@ class RE:
             self.gspmuts[mode] = modemuts
             self.mutators.update(modemuts)
 
+        # Create list of short mutators
+        self.shortmutators = {}
+        for mutator in self.mutators:
+            for t in range(2, 10):
+                shortened = mutator[:t]
+                others = [m[:t] for m in self.mutators if m != mutator]
+                if shortened not in others:
+                    self.shortmutators[mutator] = shortened
+                    break
+
         self.start = version_str_to_tuple(self.start)
         self.end = version_str_to_tuple(self.end)
 
-    def mutslist(self, mode, mutators):
+    def mutslist(self, mode, mutators, short=False):
         muts = []
 
         def chunks(l, n):
@@ -88,6 +98,9 @@ class RE:
             for m in self.gspmuts[mode]:
                 if (mutators & self.gspmuts[mode][m]):
                     muts.append(m)
+
+        if short:
+            muts = [self.shortmutators[m] for m in muts]
 
         return muts
 
@@ -108,6 +121,7 @@ class RE_1_5_dev(RE):
 
     # Mode Lists
     modes = {
+        "edit": 1,
         "dm": 2,
         "ctf": 3,
         "dac": 4,
@@ -134,7 +148,8 @@ class RE_1_5_dev(RE):
 
     # Fancy Mode Names
     modestr = [
-        "Demo", "Editing", "Deathmatch", "CTF", "DAC", "Bomber Ball", "Race"
+        "Demo", "Editing", "Deathmatch",
+        "Capture", "Defend", "Bomber Ball", "Race"
     ]
 
 default = get_version_class(DEFAULT_VERSION)

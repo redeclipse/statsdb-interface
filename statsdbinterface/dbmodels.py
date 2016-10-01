@@ -160,6 +160,15 @@ class Game(db.Model):
             ret[weapon] = Weapon.from_game(weapon, self.id)
         return ret
 
+    def mode_str(self, short=False):
+        re = redeclipse.versions.get_game_version(self.id)
+        return re.cmodestr[self.mode] if short else re.modestr[self.mode]
+
+    def mutator_list(self, maxlong=0):
+        re = redeclipse.versions.get_game_version(self.id)
+        return re.mutslist(self.mode, self.mutators,
+            (maxlong and len(re.mutslist(self.mode, self.mutators)) > maxlong))
+
     def to_dict(self):
         return direct_to_dict(
             self,
