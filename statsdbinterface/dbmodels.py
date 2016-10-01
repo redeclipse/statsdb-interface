@@ -188,7 +188,8 @@ class Game(db.Model):
                 GamePlayer.score.asc()).filter(GamePlayer.score != 0).all() +
                 self.players.filter(GamePlayer.score == 0).all())
         else:
-            return self.players.order_by(GamePlayer.score.desc()).all()
+            return self.players.order_by(GamePlayer.frags.desc()).order_by(
+                GamePlayer.score.desc()).all()
 
     def to_dict(self):
         return direct_to_dict(
