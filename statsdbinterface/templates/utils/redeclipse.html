@@ -4,8 +4,8 @@
     <img src="{{ url_for('static', filename='images/modes/%s.png' % game.mode_str(True)) }}" alt="{{ game.mode_str() }}" title="{{ game.mode_str() }}" width="{{ size }}" height="{{ size }}">
 {%- endmacro %}
 
-{% macro fancy_mutators(game) -%}
-    <span title="{{ '-'.join(game.mutator_list()) }}">{{ '-'.join(game.mutator_list(3)) }}</span>
+{% macro fancy_mutators(game, maxlong=3) -%}
+    <span title="{{ '-'.join(game.mutator_list()) }}">{{ '-'.join(game.mutator_list(maxlong)) }}</span>
 {%- endmacro %}
 
 {% macro per_minute(player, value) -%}

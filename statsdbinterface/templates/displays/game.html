@@ -6,7 +6,9 @@
 {% block title %}Game {{game.id}}{% endblock title %}
 
 {% block content %}
-    <h3 class="centering text-center">Game {{ game.id }}</h3>
+    <h3>Game {{ game.id }}</h3>
+    <p>{{game.server[0].desc}} [{{game.server[0].handle}}] - {{game.server[0].host}}:{{game.server[0].port}}</p>
+    <p>{{ redeclipse.fancy_mode(game) }} {{ redeclipse.fancy_mutators(game, 0) }} on {{ game.map }}</p>
     <table class="table table-hover">
     <thead>
         <tr>
@@ -25,7 +27,7 @@
         </tr>
     </thead>
     <tbody>
-        {% for player in game.players %}
+        {% for player in game.ordered_players() %}
             <tr>
                 <td>{{ player.name }}</td>
                 <td>{{ redeclipse.render_score(game, player) }}</td>

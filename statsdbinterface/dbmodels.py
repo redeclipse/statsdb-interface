@@ -182,6 +182,14 @@ class Game(db.Model):
                            (maxlong and len(re.mutslist(
                             self.mode, self.mutators)) > maxlong))
 
+    def ordered_players(self):
+        if self.is_timed():
+            return (self.players.order_by(
+                GamePlayer.score.asc()).filter(GamePlayer.score != 0).all() +
+                self.players.filter(GamePlayer.score == 0).all())
+        else:
+            return self.players.order_by(GamePlayer.score.desc()).all()
+
     def to_dict(self):
         return direct_to_dict(
             self,
