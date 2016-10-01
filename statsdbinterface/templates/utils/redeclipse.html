@@ -1,3 +1,5 @@
+{% import 'utils/time.html' as timeutils %}
+
 {% macro fancy_mode(game, size=24) -%}
     <img src="{{ url_for('static', filename='images/modes/%s.png' % game.mode_str(True)) }}" alt="{{ game.mode_str() }}" title="{{ game.mode_str() }}" width="{{ size }}" height="{{ size }}">
 {%- endmacro %}
@@ -5,3 +7,16 @@
 {% macro fancy_mutators(game) -%}
     <span title="{{ '-'.join(game.mutator_list()) }}">{{ '-'.join(game.mutator_list(3)) }}</span>
 {%- endmacro %}
+
+{% macro per_minute(player, value) -%}
+    <span title="{{ (value / ((player.timealive|sdiv) / 60))|round(1) }} per minute">{{ value }}</span>
+{%- endmacro %}
+
+{% macro render_score(game, player) -%}
+    {% if game.is_timed() %}
+        <span>{{ timeutils.span(player.score / 1000, exact=True, decimal=True) }}</span>
+    {% else %}
+        <span>{{ per_minute(player, player.score) }}</span>
+    {% endif %}
+{%- endmacro %}
+

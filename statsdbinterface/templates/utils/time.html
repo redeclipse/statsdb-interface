@@ -1,7 +1,7 @@
 {% macro ago(time) -%}
-    <span title="{{ utils.timestr(time) }}">{{ utils.timeago(time, True) }} ago</span>
+    <span title="{{ time|time_str }}">{{ time|time_ago(True) }} ago</span>
 {%- endmacro %}
 
-{% macro span(time) -%}
-    <span title="{{ utils.duration_str(time, exact=True) }}">{{ utils.duration_str(time) }}</span>
+{% macro span(time, short=True, exact=False, decimal=False) -%}
+    <span title="{{ time|duration_str(short=False, exact=True, decimal=decimal) }}">{{ time|duration_str(short=short, exact=exact, decimal=decimal) }}</span>
 {%- endmacro %}

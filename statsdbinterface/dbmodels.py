@@ -160,6 +160,18 @@ class Game(db.Model):
             ret[weapon] = Weapon.from_game(weapon, self.id)
         return ret
 
+    def is_timed(self):
+        re = redeclipse.versions.get_game_version(self.id)
+        return self.mode == re.modes['race'] and 'timed' in re.mutslist(
+            self.mode, self.mutators)
+
+    def is_peaceful(self):
+        re = redeclipse.versions.get_game_version(self.id)
+        if self.mode == re.modes['race'] and 'gauntlet' not in re.mutslist(
+                self.mode, self.mutators):
+                    return True
+        return False
+
     def mode_str(self, short=False):
         re = redeclipse.versions.get_game_version(self.id)
         return re.cmodestr[self.mode] if short else re.modestr[self.mode]
@@ -167,7 +179,8 @@ class Game(db.Model):
     def mutator_list(self, maxlong=0):
         re = redeclipse.versions.get_game_version(self.id)
         return re.mutslist(self.mode, self.mutators,
-            (maxlong and len(re.mutslist(self.mode, self.mutators)) > maxlong))
+                           (maxlong and len(re.mutslist(
+                            self.mode, self.mutators)) > maxlong))
 
     def to_dict(self):
         return direct_to_dict(
@@ -219,6 +232,13 @@ class GamePlayer(db.Model):
         return [b.to_dict() for b in GameCapture.query.filter(
             and_(GameCapture.game == self.game_id,
                 GameCapture.player == self.wid)).all()]
+
+    def damage(self):
+        res = GameWeapon.query.with_entities(
+            db.func.sum(GameWeapon.damage1), db.func.sum(GameWeapon.damage2)
+            ).filter(GameWeapon.game_id == self.game_id).filter(
+                GameWeapon.player == self.wid).all()
+        return res[0][0] + res[0][1]
 
     def to_dict(self):
         return direct_to_dict(self, [

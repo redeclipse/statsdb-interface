@@ -1,8 +1,46 @@
 {% extends 'base.html' %}
+{% import 'utils/redeclipse.html' as redeclipse %}
+{% import 'utils/time.html' as timeutils %}
 {% set current_display = "games" %}
 
 {% block title %}Game {{game.id}}{% endblock title %}
 
 {% block content %}
-    Game {{game.id}}
+    <h3 class="centering text-center">Game {{ game.id }}</h3>
+    <table class="table table-hover">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Score</th>
+            <th>Handle</th>
+            <th>Alive</th>
+            {% if not game.is_peaceful() %}
+                <th>Frags</th>
+            {% endif %}
+            <th>Deaths</th>
+            {% if not game.is_peaceful() %}
+                <th>F/D Ratio</th>
+                <th>Damage</th>
+            {% endif %}
+        </tr>
+    </thead>
+    <tbody>
+        {% for player in game.players %}
+            <tr>
+                <td>{{ player.name }}</td>
+                <td>{{ redeclipse.render_score(game, player) }}</td>
+                <td>{{ player.handle }}</td>
+                <td>{{ timeutils.span(player.timealive) }}</td>
+                {% if not game.is_peaceful() %}
+                    <td>{{ redeclipse.per_minute(player, player.frags) }}</td>
+                {% endif %}
+                <td>{{ redeclipse.per_minute(player, player.deaths) }}</td>
+                {% if not game.is_peaceful() %}
+                    <td>{{ (player.frags/(player.deaths|sdiv))|round(1) }}</td>
+                    <td>{{ redeclipse.per_minute(player, player.damage()) }}</td>
+                {% endif %}
+            <tr>
+        {% endfor %}
+    </tbody>
+</table>
 {% endblock content %}
