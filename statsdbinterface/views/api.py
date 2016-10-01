@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 import math
 from flask import jsonify, request, Blueprint, abort
 from .. import dbmodels, extmodels

@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 from flask import abort
 from .database import db
 from .dbmodels import Game, GamePlayer, GameServer, GameWeapon

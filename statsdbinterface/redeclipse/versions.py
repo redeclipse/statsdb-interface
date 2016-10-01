@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 from ..dbmodels import Game
 from collections import OrderedDict
 

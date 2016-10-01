@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from flask import abort
 from flask_sqlalchemy import Pagination
 

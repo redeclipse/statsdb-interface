@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 # Set these manually.
 
 # Set to True to enable debug functions such as Flask's debugging server.

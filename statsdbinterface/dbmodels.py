@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 from sqlalchemy import and_
 from .database import db
 from .modelutils import direct_to_dict, list_to_id_dict
