@@ -16,7 +16,9 @@ def static(path):
 
 @bp.route("/")
 def display_dashboard():
-    return render_template('displays/dashboard.html')
+    games = dbmodels.Game.query.order_by(dbmodels.Game.id.desc()).limit(
+        config.DISPLAY_RESULTS_RECENT).all()
+    return render_template('displays/dashboard.html', games=games)
 
 
 @bp.route("/games")

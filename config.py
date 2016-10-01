@@ -19,6 +19,9 @@ API_HIGHSCORE_RESULTS = 10
 # Number of results to return in a display list page.
 DISPLAY_RESULTS_PER_PAGE = 15
 
+# Number of results to return in a 'recent' list.
+DISPLAY_RESULTS_RECENT = 10
+
 
 # These are set in other parts of the program.
 

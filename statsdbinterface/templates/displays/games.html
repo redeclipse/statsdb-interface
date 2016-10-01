@@ -1,33 +1,8 @@
 {% extends 'base.html' %}
-{% import 'utils/redeclipse.html' as redeclipse %}
-{% import 'utils/time.html' as timeutils with context %}
 {% set current_display = "games" %}
 
 {% block title %}Games{% endblock title %}
 
 {% block content %}
-    <table class="table table-hover">
-        <thead>
-            <tr>
-                <th>Game</th>
-                <th>Mode</th>
-                <th>Map</th>
-                <th>Server</th>
-                <th>When</th>
-                <th>Length</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for game in games %}
-                <tr>
-                    <td><a href="{{ url_for('.display_game', gameid=game.id) }}">{{ game.id }}</a></td>
-                    <td>{{ redeclipse.fancy_mode(game) }}{% if game.mutators != 0 %} {{ redeclipse.fancy_mutators(game) }}{% endif %}</td>
-                    <td>{{ game.map }}</td>
-                    <td>{{ game.server.first().handle }}</td>
-                    <td>{{ timeutils.ago(game.time) }}</td>
-                    <td>{{ timeutils.span(game.timeplayed) }}</td>
-                <tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    {% include 'tables/games.html' %}
 {% endblock content %}

@@ -4,5 +4,7 @@
 {% block title %}Dashboard{% endblock title %}
 
 {% block content %}
-    Test <i>HTML</i>
+    <h3 class="centering text-center">Recent Games</h3>
+    {% include 'tables/games.html' %}
+    <a href="/games" class="btn btn-default pull-right">More...</a>
 {% endblock content %}

@@ -20,6 +20,7 @@ def api_config():
         "api_results_per_page": config.API_RESULTS_PER_PAGE,
         "api_highscore_results": config.API_HIGHSCORE_RESULTS,
         "display_results_per_page": config.DISPLAY_RESULTS_PER_PAGE,
+        "display_results_recent": config.DISPLAY_RESULTS_RECENT,
     })
 
 
