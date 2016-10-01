@@ -190,6 +190,15 @@ class Game(db.Model):
                 GamePlayer.score.desc(), GamePlayer.frags.desc(),
                 GamePlayer.deaths.asc()).all()
 
+    def ordered_teams(self):
+        if self.is_timed():
+            return (self.teams.order_by(
+                GameTeam.score.asc()).filter(GamePlayer.score != 0).all() +
+                self.teams.filter(GameTeam.score == 0).all())
+        else:
+            return self.teams.order_by(
+                GameTeam.score.desc(), GameTeam.team.asc()).all()
+
     def to_dict(self):
         return direct_to_dict(
             self,
@@ -246,7 +255,7 @@ class GamePlayer(db.Model):
             db.func.sum(GameWeapon.damage1), db.func.sum(GameWeapon.damage2)
             ).filter(GameWeapon.game_id == self.game_id).filter(
                 GameWeapon.player == self.wid).all()
-        return res[0][0] + res[0][1]
+        return (res[0][0] or 0) + (res[0][1] or 0)
 
     def to_dict(self):
         return direct_to_dict(self, [

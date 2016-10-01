@@ -1,5 +1,9 @@
 {% import 'utils/time.html' as timeutils %}
 
+{% macro fancy_team(team, size=24) -%}
+    <img src="{{ url_for('static', filename='images/teams/%d.png' % team.team) }}" alt="{{ team.name }}" title="{{ team.name }}" width="{{ size }}" height="{{ size }}">
+{%- endmacro %}
+
 {% macro fancy_mode(game, size=24) -%}
     <img src="{{ url_for('static', filename='images/modes/%s.png' % game.mode_str(True)) }}" alt="{{ game.mode_str() }}" title="{{ game.mode_str() }}" width="{{ size }}" height="{{ size }}">
 {%- endmacro %}
@@ -20,3 +24,10 @@
     {% endif %}
 {%- endmacro %}
 
+{% macro render_team_score(game, team) -%}
+    {% if game.is_timed() %}
+        <span>{{ timeutils.span(team.score / 1000, exact=True, decimal=True) }}</span>
+    {% else %}
+        <span>{{ team.score }}</span>
+    {% endif %}
+{%- endmacro %}
