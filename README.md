@@ -1,4 +1,4 @@
-# statsdb-interface-2
+# statsdb-interface
 Statistics Interface for Red Eclipse
 
 # Dependencies
