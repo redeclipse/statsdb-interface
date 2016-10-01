@@ -34,7 +34,7 @@ def default_error_handler(error):
 
     # build error message and return the rendered error page
     return render_template("error.html", code=code, name=name,
-                           description=description), 500
+                           description=description), code
 
 
 def setup_app(app):
