@@ -26,8 +26,7 @@ def display_games():
             request.args.get("page", default=1, type=int),
             config.DISPLAY_RESULTS_PER_PAGE)
 
-    return render_template('displays/games.html',
-                           games=pager.items, pager=pager)
+    return render_template('displays/games.html', pager=pager)
 
 
 @bp.route("/games/<int:gameid>")
@@ -42,8 +41,7 @@ def display_servers():
         request.args.get("page", default=1, type=int),
         config.DISPLAY_RESULTS_PER_PAGE)
 
-    ret = render_template('displays/servers.html',
-                          servers=pager.items, pager=pager)
+    ret = render_template('displays/servers.html', pager=pager)
     return ret
 
 
@@ -61,7 +59,7 @@ def display_server_games(handle):
             dbmodels.Game.id.desc()).paginate(
             request.args.get("page", default=1, type=int),
             config.DISPLAY_RESULTS_PER_PAGE)
-    return render_template('displays/server_games.html',
-                           server=server, games=pager.items, pager=pager)
+    return render_template('displays/server_games.html', server=server,
+                           pager=pager)
 
-templateutils.register(bp)
+templateutils.setup(bp)

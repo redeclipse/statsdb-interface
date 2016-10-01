@@ -70,7 +70,7 @@ def sdiv(n):
     return max(1, n)
 
 
-def register(bp):
+def setup(bp):
     bp.app_template_filter()(sdiv)
     bp.app_template_filter()(time_ago)
     bp.app_template_filter()(time_str)

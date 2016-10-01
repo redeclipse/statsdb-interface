@@ -4,5 +4,6 @@
 {% block title %}Games{% endblock title %}
 
 {% block content %}
+    {% set games = pager.items %}
     {% include 'tables/games.html' %}
 {% endblock content %}
