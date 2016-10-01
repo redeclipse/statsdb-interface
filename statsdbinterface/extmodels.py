@@ -110,7 +110,8 @@ class Server:
         if pagesize is not None:
             filtered_handles = handles[
                 page * pagesize:page * pagesize + pagesize]
-        return [Server(handle) for handle in filtered_handles]
+        return sorted([Server(handle) for handle in filtered_handles],
+                      key=lambda s: s.latest.game.time, reverse=True)
 
     @classmethod
     def paginate(cls, page, per_page):
@@ -119,10 +120,14 @@ class Server:
     def __init__(self, handle):
         # Build a Server object from the database.
         self.handle = handle
+        all_games = [r[0] for r in Game.query.with_entities(Game.id).all()]
         self.game_ids = [r[0] for r in GameServer.query.with_entities(
             GameServer.game_id).filter(GameServer.handle == self.handle).all()
-            if Game.query.with_entities(Game.id).filter(
-                Game.id == r[0]).scalar() is not None]
+            if r[0] in all_games]
+        self.latest = GameServer.query.filter(
+            GameServer.game_id == self.game_ids[-1]).first()
+        self.first = GameServer.query.filter(
+            GameServer.game_id == self.game_ids[0]).first()
 
     def games(self, page=0, pagesize=None):
         # Return full Game objects from Server's game_ids.
@@ -133,6 +138,13 @@ class Server:
             return []
         return Game.query.filter(Game.id.in_(ids)).all()
 
+    def recent_games(self, number):
+        ids = reversed(self.game_ids[-number:])
+        if not ids:
+            return []
+        return Game.query.filter(
+            Game.id.in_(ids)).order_by(Game.id.desc()).all()
+
     def games_paginate(self, page, per_page):
         return to_pagination(page, per_page, self.games,
                              lambda: len(self.game_ids))
@@ -140,7 +152,10 @@ class Server:
     def to_dict(self):
         return direct_to_dict(self, [
             "handle", "game_ids"
-        ])
+        ], {
+            "latest": self.latest,
+            "first": self.first,
+        })
 
 
 class Map:

@@ -1,5 +1,5 @@
-{% macro ago(time) -%}
-    <span title="{{ time|time_str }}">{{ time|time_ago(True) }} ago</span>
+{% macro ago(time, short=True) -%}
+    <span title="{{ time|time_str }}">{{ time|time_ago(short=short) }} ago</span>
 {%- endmacro %}
 
 {% macro span(time, short=True, exact=False, decimal=False) -%}

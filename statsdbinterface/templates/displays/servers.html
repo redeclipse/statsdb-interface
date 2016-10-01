@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% set current_display = "servers" %}
+
+{% block title %}Servers{% endblock title %}
+
+{% block content %}
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th>Server</th>
+                <th>Description</th>
+                <th>Games</th>
+                <th>First Game</th>
+                <th>Latest Game</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for server in servers %}
+                <tr>
+                    <td><a href="{{ url_for('.display_server', handle=server.handle) }}">{{ server.handle }}</a></td>
+                    <td>{{ server.latest.desc }}</td>
+                    <td>{{ server.game_ids|count }}</td>
+                    <td><a title="{{ server.first.game.time|time_ago }} ago, {{ server.first.game.time|time_str }}" href="{{ url_for('.display_game', gameid=server.first.game_id) }}">{{ server.first.game_id }}</a></td>
+                    <td><a title="{{ server.latest.game.time|time_ago }} ago, {{ server.latest.game.time|time_str }}" href="{{ url_for('.display_game', gameid=server.latest.game_id) }}">{{ server.latest.game_id }}</a></td>
+                <tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock content %}

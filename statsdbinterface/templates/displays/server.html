@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% set current_display = "servers" %}
+
+{% block title %}Server: {{ server.handle }}{% endblock title %}
+
+{% block content %}
+    <h3>{{ server.handle }}</h3>
+    {% set games = server.recent_games(config.DISPLAY_RESULTS_RECENT) %}
+    {% include 'tables/games.html' %}
+    <a href="{{ url_for('.display_server_games', handle=server.handle) }}" class="btn btn-default pull-right">More...</a>
+{% endblock content %}
