@@ -3,7 +3,7 @@ import config
 from flask import Blueprint, render_template, send_from_directory, request
 
 from .. import dbmodels
-
+from . import templateutils
 
 # displays blueprint
 bp = Blueprint(__name__, __name__)
@@ -33,3 +33,10 @@ def display_games():
 def display_game(gameid):
     game = dbmodels.Game.query.filter_by(id=gameid).first_or_404()
     return render_template('displays/game.html', game=game)
+
+
+@bp.context_processor
+def utility_processor():
+    return {
+        "utils": templateutils,
+    }

@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% import 'utils/time.html' as timeutils with context %}
 {% set current_display = "games" %}
 
 {% block title %}Games{% endblock title %}
@@ -22,7 +23,7 @@
                     <td>{{ game.map }}</td>
                     <td>{{ game.mode }}{% if game.mutators != 0 %} {{ game.mutators }}{% endif %}</td>
                     <td>{{ game.server.first().handle }}</td>
-                    <td>{{ game.time }}</td>
+                    <td>{{ timeutils.ago(game.time) }}</td>
                     <td>{{ game.timeplayed }}</td>
                 <tr>
             {% endfor %}
