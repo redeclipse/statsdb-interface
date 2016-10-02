@@ -71,7 +71,5 @@ def sdiv(n):
 
 
 def setup(bp):
-    bp.app_template_filter()(sdiv)
-    bp.app_template_filter()(time_ago)
-    bp.app_template_filter()(time_str)
-    bp.app_template_filter()(duration_str)
+    for f in [time_str, duration_str, time_ago, sdiv]:
+        bp.add_app_template_filter(f)
