@@ -1,4 +1,4 @@
-from flask import abort
+from werkzeug.exceptions import NotFound
 from flask_sqlalchemy import Pagination
 
 
@@ -38,10 +38,10 @@ def list_to_id_dict(base, attribute):
 
 def to_pagination(page, per_page, page_function, count_function):
     if page < 1 or per_page < 1:
-        abort(404)
+        raise NotFound
     items = page_function(page - 1, per_page)
     if not items and page != 1:
-        abort(404)
+        raise NotFound
     if page == 1 and len(items) < per_page:
         total = len(items)
     else:

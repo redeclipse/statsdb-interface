@@ -1,5 +1,6 @@
 import math
-from flask import jsonify, request, Blueprint, abort
+from flask import jsonify, request, Blueprint
+from werkzeug.exceptions import NotFound
 from ..database import models, extmodels
 import config
 
@@ -214,7 +215,7 @@ def api_game_player_weapons(handle, gameid):
     game = models.Game.query.filter_by(id=gameid).first_or_404()
 
     if handle not in [p.handle for p in game.players]:
-        abort(404)
+        raise NotFound
 
     ret = {}
     for weapon in extmodels.Weapon.weapon_list():
@@ -235,10 +236,10 @@ def api_game_player_weapon(handle, gameid, weapon):
     game = models.Game.query.filter_by(id=gameid).first_or_404()
 
     if handle not in [p.handle for p in game.players]:
-        abort(404)
+        raise NotFound
 
     if weapon not in extmodels.Weapon.weapon_list():
-        abort(404)
+        raise NotFound
 
     resp = jsonify(
         extmodels.Weapon.from_game_player(weapon, gameid, handle).to_dict())

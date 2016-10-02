@@ -1,4 +1,4 @@
-from flask import abort
+from werkzeug.exceptions import NotFound
 from .core import db
 from .models import Game, GamePlayer, GameServer, GameWeapon
 from .modelutils import direct_to_dict, to_pagination
@@ -28,7 +28,7 @@ class Player:
         if handle in handles:
             return Player(handle)
         else:
-            abort(404)
+            raise NotFound
 
     @staticmethod
     def all(page=0, pagesize=None):
@@ -98,7 +98,7 @@ class Server:
         if handle in handles:
             return Server(handle)
         else:
-            abort(404)
+            raise NotFound
 
     @staticmethod
     def all(page=0, pagesize=None):
@@ -175,7 +175,7 @@ class Map:
         if name in names:
             return Map(name)
         else:
-            abort(404)
+            raise NotFound
 
     def all(page=0, pagesize=None):
         # Return all m, with optional paging.
@@ -314,7 +314,7 @@ class Weapon:
         if name in names:
             return Weapon.from_weapon(name)
         else:
-            abort(404)
+            raise NotFound
 
     @staticmethod
     def all():
