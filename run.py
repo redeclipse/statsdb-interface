@@ -7,7 +7,7 @@ from tornado.wsgi import WSGIContainer
 from tornado.httpserver import HTTPServer
 from tornado.ioloop import IOLoop
 
-from statsdbinterface import create_app
+from statsdbinterface import app_factory
 
 import config
 
@@ -31,7 +31,7 @@ if __name__ == "__main__":
     config.data_directory = data_dir
 
     # Create a new Flask app instance and apply the configuration
-    app = create_app(config)
+    app = app_factory.create_app(config)
 
     # Start server
     if config.DEBUG:

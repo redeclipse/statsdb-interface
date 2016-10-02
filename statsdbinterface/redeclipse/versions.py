@@ -1,4 +1,4 @@
-from ..dbmodels import Game
+from ..database.models import Game
 from collections import OrderedDict
 
 

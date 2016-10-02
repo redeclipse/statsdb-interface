@@ -1,5 +1,4 @@
 from flask_sqlalchemy import SQLAlchemy
-
 import inspect
 import traceback
 import config
@@ -50,4 +49,5 @@ def setup_db(app):
                 conn.connection.create_function(f[0], f[1], f[2])
 
     # Register models, functions and views.
-    from . import redeclipse, dbmodels, views  # noqa
+    from .. import redeclipse, views  # noqa
+    from . import models  # noqa

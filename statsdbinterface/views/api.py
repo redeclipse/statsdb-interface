@@ -1,6 +1,6 @@
 import math
 from flask import jsonify, request, Blueprint, abort
-from .. import dbmodels, extmodels
+from ..database import models, extmodels
 import config
 
 
@@ -28,7 +28,7 @@ def api_count_games():
     The /count/ functions return rows and pages for the lists.
     """
 
-    rowcount = dbmodels.Game.query.count()
+    rowcount = models.Game.query.count()
     return jsonify({
         "rows": rowcount,
         "pages": math.ceil(rowcount / config.API_RESULTS_PER_PAGE),
@@ -99,7 +99,7 @@ def api_games():
     """
 
     # Get a list of games sorted by id and offset by the page.
-    games = dbmodels.Game.query.order_by(dbmodels.Game.id).paginate(
+    games = models.Game.query.order_by(models.Game.id).paginate(
         request.args.get("page", default=1, type=int),
         config.API_RESULTS_PER_PAGE).items
 
@@ -117,7 +117,7 @@ def api_game(gameid):
     Return a single game.
     """
 
-    game = dbmodels.Game.query.filter_by(id=gameid).first_or_404()
+    game = models.Game.query.filter_by(id=gameid).first_or_404()
     resp = jsonify(game.to_dict())
     return resp
 
@@ -128,7 +128,7 @@ def api_game_weapons(gameid):
     Return a single games's weapons.
     """
 
-    game = dbmodels.Game.query.filter_by(id=gameid).first_or_404()
+    game = models.Game.query.filter_by(id=gameid).first_or_404()
 
     ret = {}
     weapons = game.full_weapons()
@@ -211,7 +211,7 @@ def api_game_player_weapons(handle, gameid):
     Return a single game player's weapons.
     """
 
-    game = dbmodels.Game.query.filter_by(id=gameid).first_or_404()
+    game = models.Game.query.filter_by(id=gameid).first_or_404()
 
     if handle not in [p.handle for p in game.players]:
         abort(404)
@@ -232,7 +232,7 @@ def api_game_player_weapon(handle, gameid, weapon):
     Return a single game player's weapons.
     """
 
-    game = dbmodels.Game.query.filter_by(id=gameid).first_or_404()
+    game = models.Game.query.filter_by(id=gameid).first_or_404()
 
     if handle not in [p.handle for p in game.players]:
         abort(404)

@@ -1,7 +1,7 @@
 from sqlalchemy import and_
-from .database import db
+from .core import db
 from .modelutils import direct_to_dict, list_to_id_dict
-from . import redeclipse
+from .. import redeclipse
 
 
 class GameBombing(db.Model):

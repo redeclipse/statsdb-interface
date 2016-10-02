@@ -1,5 +1,5 @@
-from ..database import db_function
-from ..dbmodels import Game
+from ..database.core import db_function
+from ..database.models import Game
 from . import versions
 
 
