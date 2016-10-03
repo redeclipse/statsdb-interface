@@ -365,3 +365,31 @@ def api_weapon(name):
     weapon = extmodels.Weapon.get_or_404(name)
     resp = jsonify(weapon.to_dict())
     return resp
+
+
+@bp.route("/modes")
+def api_modes():
+    ret = {}
+    for mode in extmodels.Mode.all():
+        ret[mode.name] = mode.to_dict()
+    return jsonify(ret)
+
+
+@bp.route("/modes/<string:name>")
+def api_mode(name):
+    mode = extmodels.Mode.get_or_404(name)
+    return jsonify(mode.to_dict())
+
+
+@bp.route("/mutators")
+def api_mutators():
+    ret = {}
+    for mutator in extmodels.Mutator.all():
+        ret[mutator.name] = mutator.to_dict()
+    return jsonify(ret)
+
+
+@bp.route("/mutators/<string:name>")
+def api_mutator(name):
+    mutator = extmodels.Mutator.get_or_404(name)
+    return jsonify(mutator.to_dict())

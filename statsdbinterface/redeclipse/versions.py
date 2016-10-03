@@ -78,7 +78,9 @@ class RE:
                     self.shortmutators[mutator] = shortened
                     break
 
+        self.startstr = self.start
         self.start = version_str_to_tuple(self.start)
+        self.endstr = self.end
         self.end = version_str_to_tuple(self.end)
 
     def mutslist(self, mode, mutators, short=False):
@@ -119,6 +121,7 @@ class RE_1_5_dev(RE):
 
     # Mode Lists
     modes = {
+        "demo": 0,
         "edit": 1,
         "dm": 2,
         "ctf": 3,

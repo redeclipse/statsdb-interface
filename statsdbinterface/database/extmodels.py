@@ -105,7 +105,6 @@ class Server:
         return [r[0] for r in
                 GameServer.query.with_entities(GameServer.handle).filter(
                 GameServer.handle != '').group_by(GameServer.handle)
-                .group_by(GameServer.handle)
                 .order_by(GameServer.game_id.desc()).all()]
 
     @staticmethod
@@ -183,7 +182,8 @@ class Map:
     def map_list():
         # Return a list of all map names in the database.
         return [r[0] for r in
-                Game.query.with_entities(Game.map).group_by(Game.map).all()]
+                Game.query.with_entities(Game.map).group_by(Game.map)
+                .order_by(GameServer.game_id.desc()).all()]
 
     @staticmethod
     def count():
@@ -199,6 +199,7 @@ class Map:
         else:
             raise NotFound
 
+    @staticmethod
     def all(page=0, pagesize=None):
         # Return all m, with optional paging.
         filtered_names = names = Map.map_list()
@@ -221,6 +222,10 @@ class Map:
                 Game.map == self.name
             ).all()
         ]
+        self.latest = Game.query.filter(
+            Game.id == self.game_ids[-1]).first()
+        self.first = Game.query.filter(
+            Game.id == self.game_ids[0]).first()
 
     def games(self, page=0, pagesize=None):
         # Return full Game objects from Map's game_ids.
@@ -275,6 +280,121 @@ class Map:
         ], {
             "topraces": self.topraces(),
         })
+
+
+class Mode:
+    @staticmethod
+    def mode_list():
+        return redeclipse.versions.default.modes.keys()
+
+    @staticmethod
+    def count():
+        return len(Mode.mode_list())
+
+    @staticmethod
+    def get_or_404(name):
+        names = Mode.mode_list()
+        if name in names:
+            return Mode(name)
+        else:
+            raise NotFound
+
+    @staticmethod
+    def all():
+        return [Mode(name) for name in Mode.mode_list()]
+
+    def __init__(self, name):
+        self.name = name
+        self.game_ids = [
+            r[0] for r in
+            Game.query.with_entities(Game.id).filter(
+                db.func.re_mode(Game.id, self.name)).all()
+        ]
+
+    def games(self, page=0, pagesize=None):
+        # Return full Game objects from Mode's game_ids.
+        ids = (self.game_ids[page * pagesize:page * pagesize + pagesize]
+               if pagesize is not None else
+               self.game_ids)
+        if not ids:
+            return []
+        return Game.query.filter(Game.id.in_(ids)).all()
+
+    def games_paginate(self, page, per_page):
+        return to_pagination(page, per_page, self.games,
+                             lambda: len(self.game_ids))
+
+    def to_dict(self):
+        return direct_to_dict(self, [
+            "name", "game_ids"
+        ])
+
+
+class Mutator:
+
+    @staticmethod
+    def mutator_list():
+        re = redeclipse.versions.default
+        basemuts = re.basemuts.keys()
+        gspmuts = []
+        for mode in re.modes:
+            modei = re.modes[mode]
+            if modei in re.gspmuts:
+                for mut in re.gspmuts[modei]:
+                    gspmuts.append("%s-%s" % (mode, mut))
+        return list(basemuts) + gspmuts
+
+    @staticmethod
+    def count():
+        return len(Mutator.mutator_list())
+
+    @staticmethod
+    def get_or_404(name):
+        names = Mutator.mutator_list()
+        if name in names:
+            return Mutator(name)
+        else:
+            raise NotFound
+
+    @staticmethod
+    def all():
+        return [Mutator(name) for name in Mutator.mutator_list()]
+
+    def __init__(self, name):
+        self.name = name
+        if '-' in self.name:
+            self.game_ids = [
+                r[0] for r in
+                Game.query.with_entities(Game.id)
+                .filter(db.func.re_mut(Game.id, self.name.split("-")[1]))
+                .filter(db.func.re_mode(Game.id, self.name.split("-")[0]))
+                .all()
+            ]
+        else:
+            self.game_ids = [
+                r[0] for r in
+                Game.query.with_entities(Game.id)
+                .filter(db.func.re_mut(Game.id, self.name))
+                .all()
+            ]
+
+    def games(self, page=0, pagesize=None):
+        # Return full Game objects from Mutator's game_ids.
+        ids = (self.game_ids[page * pagesize:page * pagesize + pagesize]
+               if pagesize is not None else
+               self.game_ids)
+        if not ids:
+            return []
+        return Game.query.filter(Game.id.in_(ids)).all()
+
+    def games_paginate(self, page, per_page):
+        return to_pagination(page, per_page, self.games,
+                             lambda: len(self.game_ids))
+
+    def to_dict(self):
+        return direct_to_dict(self, [
+            "name", "game_ids"
+        ])
 
 
 class Weapon:
