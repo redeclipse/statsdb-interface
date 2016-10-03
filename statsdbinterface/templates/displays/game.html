@@ -82,9 +82,7 @@
                     <tr>
                         <td>{{ round.round }}</td>
                         <td>{{ redeclipse.wid_to_player(game, round.winner) }}</td>
-                        <td>
-                            {%- for wid in round.players %}{% if loop.index > 1 %}; {% endif %}{{ redeclipse.wid_to_player(game, wid) }}{%- endfor %}
-                        </td>
+                        <td>{%- for wid in round.players %}{% if loop.index > 1 %}; {% endif %}{{ redeclipse.wid_to_player(game, wid) }}{%- endfor %}</td>
                     </tr>
                 {% endfor %}
             </tbody>
