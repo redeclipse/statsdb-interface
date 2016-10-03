@@ -183,7 +183,7 @@ class Map:
         # Return a list of all map names in the database.
         return [r[0] for r in
                 Game.query.with_entities(Game.map).group_by(Game.map)
-                .order_by(GameServer.game_id.desc()).all()]
+                .order_by(Game.id.desc()).all()]
 
     @staticmethod
     def count():
@@ -236,6 +236,13 @@ class Map:
             return []
         return Game.query.filter(Game.id.in_(ids)).all()
 
+    def recent_games(self, number):
+        ids = reversed(self.game_ids[-number:])
+        if not ids:
+            return []
+        return Game.query.filter(
+            Game.id.in_(ids)).order_by(Game.id.desc()).all()
+
     def games_paginate(self, page, per_page):
         return to_pagination(page, per_page, self.games,
                              lambda: len(self.game_ids))
@@ -248,6 +255,7 @@ class Map:
                 "handle": r[1],
                 "name": r[2],
                 "score": r[3],
+                "when": r[4],
             }
             for r in
             (
@@ -255,8 +263,10 @@ class Map:
                 # We only need some information.
                 .with_entities(
                     GamePlayer.game_id, GamePlayer.handle,
-                    GamePlayer.name, GamePlayer.score
+                    GamePlayer.name, GamePlayer.score,
+                    Game.time,
                 )
+                .join(Game)
                 # Only games from this map.
                 .filter(GamePlayer.game_id.in_(self.game_ids))
                 # Only timed race.

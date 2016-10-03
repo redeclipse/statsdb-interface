@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% import 'utils/time.html' as timeutils %}
+{% set current_display = "maps" %}
+
+{% block title %}Maps{% endblock title %}
+
+{% block content %}
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th>Map</th>
+                <th>Games</th>
+                <th>First Game</th>
+                <th>Latest Game</th>
+                <th>Top Race</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for map in pager.items %}
+                <tr>
+                    <td><a href="{{ url_for('.display_map', name=map.name) }}">{{ map.name }}</a></td>
+                    <td>{{ map.game_ids|count }}</td>
+                    <td><a title="{{ map.first.time|time_ago }} ago, {{ map.first.time|time_str }}" href="{{ url_for('.display_game', gameid=map.first.id) }}">{{ map.first.id }}</a></td>
+                    <td><a title="{{ map.latest.time|time_ago }} ago, {{ map.latest.time|time_str }}" href="{{ url_for('.display_game', gameid=map.latest.id) }}">{{ map.latest.id }}</a></td>
+                    {% if map.topraces() %}
+                        {% set toprace = map.topraces()[0] %}
+                        <td>{{ timeutils.span(toprace.score / 1000, exact=True, decimal=True) }} by
+                        {% if toprace.handle %}
+                            <a href="{{ url_for('.display_player', handle=toprace.handle) }}">{{ toprace.handle }}</a>
+                        {% else %}
+                            {{ toprace.name }}
+                        {% endif %}
+                        in <a href="{{ url_for('.display_game', gameid=toprace.game_id) }}">game {{ toprace.game_id }}</a></td>
+                    {% else %}
+                        <td><i>N/A</i></td>
+                    {% endif %}
+                <tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock content %}

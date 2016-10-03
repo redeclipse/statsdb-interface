@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% set current_display = "maps" %}
+
+{% block title %}Map Games: {{ map.name }}{% endblock title %}
+
+{% block content %}
+    <h3><a href="{{ url_for('.display_map', name=map.name) }}">{{ map.name }}</a></h3>
+    {% set games = pager.items %}
+    {% include 'tables/games.html' %}
+{% endblock content %}

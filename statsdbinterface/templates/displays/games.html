@@ -4,6 +4,7 @@
 {% block title %}Games{% endblock title %}
 
 {% block content %}
+    <p>{{ Game.query.count() }} games total.</p>
     {% set games = pager.items %}
     {% include 'tables/games.html' %}
 {% endblock content %}

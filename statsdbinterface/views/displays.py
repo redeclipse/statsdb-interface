@@ -26,7 +26,8 @@ def display_games():
             request.args.get("page", default=1, type=int),
             config.DISPLAY_RESULTS_PER_PAGE)
 
-    return render_template('displays/games.html', pager=pager)
+    return render_template('displays/games.html', pager=pager,
+                           Game=models.Game)
 
 
 @bp.route("/game/<int:gameid>")
@@ -91,6 +92,35 @@ def display_player_games(handle):
             request.args.get("page", default=1, type=int),
             config.DISPLAY_RESULTS_PER_PAGE)
     return render_template('displays/player_games.html', player=player,
+                           pager=pager)
+
+
+@bp.route("/maps")
+def display_maps():
+    pager = extmodels.Map.paginate(
+        request.args.get("page", default=1, type=int),
+        config.DISPLAY_RESULTS_PER_PAGE)
+
+    ret = render_template('displays/maps.html', pager=pager)
+    return ret
+
+
+@bp.route("/map/<string:name>")
+@bp.route("/maps/<string:name>")
+def display_map(name):
+    map = extmodels.Map.get_or_404(name)
+    return render_template('displays/map.html', map=map)
+
+
+@bp.route("/map:games/<string:name>")
+def display_map_games(name):
+    map = extmodels.Map.get_or_404(name)
+    pager = models.Game.query.filter(
+            models.Game.id.in_(map.game_ids)).order_by(
+            models.Game.id.desc()).paginate(
+            request.args.get("page", default=1, type=int),
+            config.DISPLAY_RESULTS_PER_PAGE)
+    return render_template('displays/map_games.html', map=map,
                            pager=pager)
 
 templateutils.setup(bp)

@@ -7,8 +7,7 @@
 {% block content %}
     <h3>{{ server.handle }}</h3>
     <h4>{{ server.latest.desc }} -- {{ server.latest.host }}:{{ server.latest.port }}</h4>
-    <p>First seen {{ timeutils.ago(server.first.game.time, False) }} with <a href="{{ url_for('.display_game', gameid=server.first.game_id) }}">game {{ server.first.game_id }}</a></p>
-    <p>Last seen {{ timeutils.ago(server.latest.game.time, False) }} with <a href="{{ url_for('.display_game', gameid=server.latest.game_id) }}">game {{ server.latest.game_id }}</a></p>
+    <p>First seen {{ timeutils.ago(server.first.game.time, False) }} with <a href="{{ url_for('.display_game', gameid=server.first.game_id) }}">game {{ server.first.game_id }}</a>, Last seen {{ timeutils.ago(server.latest.game.time, False) }} with <a href="{{ url_for('.display_game', gameid=server.latest.game_id) }}">game {{ server.latest.game_id }}</a>, {{ server.game_ids|count }} games total.</p>
     {% set games = server.recent_games(config.DISPLAY_RESULTS_RECENT) %}
     {% include 'tables/games.html' %}
     <a href="{{ url_for('.display_server_games', handle=server.handle) }}" class="btn btn-default pull-right">More...</a>
