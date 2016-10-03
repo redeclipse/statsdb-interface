@@ -11,9 +11,12 @@ class Player:
     @staticmethod
     def handle_list():
         # Return a list of all player handles in the database.
-        return [r[0] for r in
-                GamePlayer.query.with_entities(GamePlayer.handle).filter(
-                GamePlayer.handle != '').group_by(GamePlayer.handle).all()]
+        ret = [r[0] for r in
+               GamePlayer.query.with_entities(GamePlayer.handle).filter(
+               GamePlayer.handle != '')
+               .group_by(GamePlayer.handle)
+               .order_by(GamePlayer.game_id.desc()).all()]
+        return ret
 
     @staticmethod
     def count():
@@ -47,10 +50,16 @@ class Player:
     def __init__(self, handle):
         # Build a Player object from the database.
         self.handle = handle
+        all_games = [r[0] for r in Game.query.with_entities(Game.id).all()]
         self.game_ids = [r[0] for r in GamePlayer.query.with_entities(
             GamePlayer.game_id).filter(GamePlayer.handle == self.handle).all()
-            if Game.query.with_entities(Game.id).filter(
-                Game.id == r[0]).scalar() is not None]
+            if r[0] in all_games]
+        self.latest = GamePlayer.query.filter(
+            GamePlayer.game_id == self.game_ids[-1],
+            GamePlayer.handle == self.handle).first()
+        self.first = GamePlayer.query.filter(
+            GamePlayer.game_id == self.game_ids[0],
+            GamePlayer.handle == self.handle).first()
 
     def games(self, page=0, pagesize=None):
         # Return full Game objects from Player's game_ids.
@@ -60,9 +69,21 @@ class Player:
             return []
         return Game.query.filter(Game.id.in_(ids)).all()
 
+    def recent_games(self, number):
+        ids = reversed(self.game_ids[-number:])
+        if not ids:
+            return []
+        return Game.query.filter(
+            Game.id.in_(ids)).order_by(Game.id.desc()).all()
+
     def games_paginate(self, page, per_page):
         return to_pagination(page, per_page, self.games,
                              lambda: len(self.game_ids))
+
+    def game_player(self, game_id):
+        return GamePlayer.query.filter(
+                GamePlayer.game_id == game_id).filter(
+                GamePlayer.handle == self.handle).first()
 
     def weapons(self):
         ret = {}
@@ -83,7 +104,9 @@ class Server:
         # Return a list of all server handles in the database.
         return [r[0] for r in
                 GameServer.query.with_entities(GameServer.handle).filter(
-                GameServer.handle != '').group_by(GameServer.handle).all()]
+                GameServer.handle != '').group_by(GameServer.handle)
+                .group_by(GameServer.handle)
+                .order_by(GameServer.game_id.desc()).all()]
 
     @staticmethod
     def count():
@@ -108,8 +131,7 @@ class Server:
         if pagesize is not None:
             filtered_handles = handles[
                 page * pagesize:page * pagesize + pagesize]
-        return sorted([Server(handle) for handle in filtered_handles],
-                      key=lambda s: s.latest.game.time, reverse=True)
+        return [Server(handle) for handle in filtered_handles]
 
     @classmethod
     def paginate(cls, page, per_page):

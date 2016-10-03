@@ -50,7 +50,11 @@
                 <tr>
                     <td>{{ player.name }}</td>
                     <td>{{ redeclipse.render_score(game, player) }}</td>
-                    <td>{{ player.handle }}</td>
+                    {% if player.handle %}
+                        <td><a href="{{ url_for('.display_player', handle=player.handle)}}">{{ player.handle }}</a></td>
+                    {% else %}
+                        <td></td>
+                    {% endif %}
                     <td>{{ timeutils.span(player.timealive) }}</td>
                     {% if not game.is_peaceful() %}
                         <td>{{ redeclipse.per_minute(player, player.frags) }}</td>

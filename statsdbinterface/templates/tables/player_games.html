@@ -1,0 +1,39 @@
+{% import 'utils/redeclipse.html' as redeclipse %}
+{% import 'utils/time.html' as timeutils %}
+
+<table class="table table-hover">
+    <thead>
+        <tr>
+            <th>Game</th>
+            <th>Mode</th>
+            <th>Map</th>
+            <th>Server</th>
+            <th>When</th>
+            <th>Length</th>
+            <th>Players</th>
+            <th>Score</th>
+            <th>Frags</th>
+            <th>Deaths</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for game in games %}
+            <tr>
+                <td><a href="{{ url_for('.display_game', gameid=game.id) }}">{{ game.id }}</a></td>
+                <td>{{ redeclipse.fancy_mode(game) }}{% if game.mutators != 0 %} {{ redeclipse.fancy_mutators(game) }}{% endif %}</td>
+                <td>{{ game.map }}</td>
+                <td><a href="{{ url_for('.display_server', handle=game.server[0].handle) }}">{{ game.server[0].handle }}</a></td>
+                <td>{{ timeutils.ago(game.time) }}</td>
+                <td>{{ timeutils.span(game.timeplayed) }}</td>
+                <td>{{ game.players.count() }}</td>
+                <td>{{ redeclipse.render_score(game, player.game_player(game.id)) }}
+                {% if game.is_peaceful() %}
+                    <td>-</td>
+                {% else %}
+                    <td>{{ redeclipse.per_minute(player.game_player(game.id), player.game_player(game.id).frags) }}</td>
+                {% endif %}
+                <td>{{ redeclipse.per_minute(player.game_player(game.id), player.game_player(game.id).deaths) }}</td>
+            <tr>
+        {% endfor %}
+    </tbody>
+</table>

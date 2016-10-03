@@ -64,4 +64,33 @@ def display_server_games(handle):
     return render_template('displays/server_games.html', server=server,
                            pager=pager)
 
+
+@bp.route("/players")
+def display_players():
+    pager = extmodels.Player.paginate(
+        request.args.get("page", default=1, type=int),
+        config.DISPLAY_RESULTS_PER_PAGE)
+
+    ret = render_template('displays/players.html', pager=pager)
+    return ret
+
+
+@bp.route("/player/<string:handle>")
+@bp.route("/players/<string:handle>")
+def display_player(handle):
+    player = extmodels.Player.get_or_404(handle)
+    return render_template('displays/player.html', player=player)
+
+
+@bp.route("/player:games/<string:handle>")
+def display_player_games(handle):
+    player = extmodels.Player.get_or_404(handle)
+    pager = models.Game.query.filter(
+            models.Game.id.in_(player.game_ids)).order_by(
+            models.Game.id.desc()).paginate(
+            request.args.get("page", default=1, type=int),
+            config.DISPLAY_RESULTS_PER_PAGE)
+    return render_template('displays/player_games.html', player=player,
+                           pager=pager)
+
 templateutils.setup(bp)

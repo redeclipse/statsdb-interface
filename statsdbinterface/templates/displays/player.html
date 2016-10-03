@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% import 'utils/time.html' as timeutils %}
+{% set current_display = "players" %}
+
+{% block title %}Player: {{ player.handle }}{% endblock title %}
+
+{% block content %}
+    <h3>{{ player.handle }}</h3>
+    <h4>{{ player.latest.name }}</h4>
+    <p>First seen {{ timeutils.ago(player.first.game.time, False) }} with <a href="{{ url_for('.display_game', gameid=player.first.game_id) }}">game {{ player.first.game_id }}</a></p>
+    <p>Last seen {{ timeutils.ago(player.latest.game.time, False) }} with <a href="{{ url_for('.display_game', gameid=player.latest.game_id) }}">game {{ player.latest.game_id }}</a></p>
+    {% set games = player.recent_games(config.DISPLAY_RESULTS_RECENT) %}
+    {% include 'tables/player_games.html' %}
+    <a href="{{ url_for('.display_player_games', handle=player.handle) }}" class="btn btn-default pull-right">More...</a>
+{% endblock content %}

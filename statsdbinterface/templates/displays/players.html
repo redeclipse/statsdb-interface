@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% set current_display = "players" %}
+
+{% block title %}Players{% endblock title %}
+
+{% block content %}
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th>Player</th>
+                <th>Last Name</th>
+                <th>Games</th>
+                <th>First Game</th>
+                <th>Latest Game</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for player in pager.items %}
+                <tr>
+                    <td><a href="{{ url_for('.display_player', handle=player.handle) }}">{{ player.handle }}</a></td>
+                    <td>{{ player.latest.name }}</td>
+                    <td>{{ player.game_ids|count }}</td>
+                    <td><a title="{{ player.first.game.time|time_ago }} ago, {{ player.first.game.time|time_str }}" href="{{ url_for('.display_game', gameid=player.first.game_id) }}">{{ player.first.game_id }}</a></td>
+                    <td><a title="{{ player.latest.game.time|time_ago }} ago, {{ player.latest.game.time|time_str }}" href="{{ url_for('.display_game', gameid=player.latest.game_id) }}">{{ player.latest.game_id }}</a></td>
+                <tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock content %}
