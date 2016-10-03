@@ -64,4 +64,66 @@
             {% endfor %}
         </tbody>
     </table>
+    {% if game.ffarounds.count() %}
+        <table class="table table-hover table-condensed">
+            <thead>
+                <tr>
+                    <th>Round</th>
+                    <th>Winner</th>
+                    <th>Participants</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for round in game.combined_ffarounds().values() %}
+                    <tr>
+                        <td>{{ round.round }}</td>
+                        <td>{{ redeclipse.wid_to_player(game, round.winner) }}</td>
+                        <td>
+                            {%- for wid in round.players %}{% if loop.index > 1 %}; {% endif %}{{ redeclipse.wid_to_player(game, wid) }}{%- endfor %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+    {% if game.captures.count() %}
+        <table class="table table-hover table-condensed">
+            <thead>
+                <tr>
+                    <th>Player</th>
+                    <th>Capturing</th>
+                    <th>Captured</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for capture in game.captures %}
+                    <tr>
+                        <td>{{ redeclipse.wid_to_player(game, capture.player) }}</td>
+                        <td>{{ redeclipse.fancy_team(game.teams.filter_by(team=capture.capturing).first()) }}</td>
+                        <td>{{ redeclipse.fancy_team(game.teams.filter_by(team=capture.captured).first()) }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+    {% if game.bombings.count() %}
+        <table class="table table-hover table-condensed">
+            <thead>
+                <tr>
+                    <th>Player</th>
+                    <th>Bombing</th>
+                    <th>Bombed</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for bombing in game.bombings %}
+                    <tr>
+                        <td>{{ redeclipse.wid_to_player(game, bombing.player) }}</td>
+                        <td>{{ redeclipse.fancy_team(game.teams.filter_by(team=bombing.bombed).first()) }}</td>
+                        <td>{{ redeclipse.fancy_team(game.teams.filter_by(team=bombing.bombing).first()) }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
 {% endblock content %}

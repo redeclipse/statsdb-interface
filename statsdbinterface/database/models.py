@@ -8,7 +8,10 @@ class GameBombing(db.Model):
     __tablename__ = "game_bombings"
 
     rowid = db.Column(db.Integer, primary_key=True)
-    game = db.Column(db.Integer)
+    game_id = db.Column('game',
+                        db.Integer, db.ForeignKey('games.id'))
+    game = db.relationship('Game',
+                           backref=db.backref('bombings', lazy='dynamic'))
     player = db.Column(db.Integer)
     playerhandle = db.Column(db.Text)
     bombing = db.Column(db.Integer)
@@ -16,7 +19,7 @@ class GameBombing(db.Model):
 
     def to_dict(self):
         return direct_to_dict(self, [
-            "game", "player", "playerhandle",
+            "game_id", "player", "playerhandle",
             "bombing", "bombed"
         ])
 
@@ -25,7 +28,10 @@ class GameCapture(db.Model):
     __tablename__ = "game_captures"
 
     rowid = db.Column(db.Integer, primary_key=True)
-    game = db.Column(db.Integer)
+    game_id = db.Column('game',
+                        db.Integer, db.ForeignKey('games.id'))
+    game = db.relationship('Game',
+                           backref=db.backref('captures', lazy='dynamic'))
     player = db.Column(db.Integer)
     playerhandle = db.Column(db.Text)
     capturing = db.Column(db.Integer)
@@ -33,7 +39,7 @@ class GameCapture(db.Model):
 
     def to_dict(self):
         return direct_to_dict(self, [
-            "game", "player", "playerhandle",
+            "game_id", "player", "playerhandle",
             "capturing", "captured"
         ])
 
@@ -143,6 +149,7 @@ class Game(db.Model):
             index = ffaround.round
             if index not in ffarounds:
                 ffarounds[index] = {
+                    "round": index,
                     "winner": None,
                     "players": [],
                 }
@@ -196,6 +203,12 @@ class Game(db.Model):
         else:
             return self.teams.order_by(
                 GameTeam.score.desc(), GameTeam.team.asc()).all()
+
+    def player_by_wid(self, wid):
+        for player in self.players:
+            if player.wid == wid:
+                return player
+        return None
 
     def to_dict(self):
         return direct_to_dict(

@@ -16,6 +16,14 @@
     <span title="{{ (value / ((player.timealive|sdiv) / 60))|round(1) }} per minute">{{ value }}</span>
 {%- endmacro %}
 
+{% macro wid_to_player(game, wid) -%}
+    {% if game.player_by_wid(wid) %}
+        <span>{{ game.player_by_wid(wid).name }}</span>
+    {% else %}
+        <span><i>bot</i></span>
+    {% endif %}
+{%- endmacro %}
+
 {% macro render_score(game, player) -%}
     {% if game.is_timed() %}
         <span>{{ timeutils.span(player.score / 1000, exact=True, decimal=True) }}</span>
