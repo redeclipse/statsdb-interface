@@ -18,7 +18,7 @@ if __name__ == "__main__":
         print("Usage: %s <data directory>" % sys.argv[0])
         sys.exit(1)
 
-    data_dir = sys.argv[1]
+    data_dir = os.path.join(os.path.abspath(os.curdir), sys.argv[1])
 
     # Validate commandline parameters
     if not os.path.isdir(data_dir):
