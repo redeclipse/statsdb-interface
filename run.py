@@ -10,13 +10,12 @@ from tornado.ioloop import IOLoop
 from statsdbinterface import app_factory
 
 
-if __name__ == "__main__":
-    # Check for data_directory argument.
-    if len(sys.argv) < 2:
-        print("Usage: %s <data directory>" % sys.argv[0])
-        sys.exit(1)
+def create_app(data_dir):
+    """
+    Create an app from a (potentially) relative path.
+    """
 
-    data_dir = os.path.join(os.path.abspath(os.curdir), sys.argv[1])
+    data_dir = os.path.join(os.path.abspath(os.curdir), data_dir)
 
     # Validate commandline parameters
     if not os.path.isdir(data_dir):
@@ -26,7 +25,16 @@ if __name__ == "__main__":
         raise RuntimeError("Could not find stats.sqlite in %s" % data_dir)
 
     # Create a new Flask app instance and apply the configuration
-    app = app_factory.create_app(data_dir)
+    return app_factory.create_app(data_dir)
+
+
+if __name__ == "__main__":
+    # Check for data_directory argument.
+    if len(sys.argv) < 2:
+        print("Usage: %s <data directory>" % sys.argv[0])
+        sys.exit(1)
+
+    app = create_app(sys.argv[1])
 
     # Start server
     if app.config['DEBUG']:
