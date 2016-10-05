@@ -295,7 +295,12 @@ class Map:
 class Mode:
     @staticmethod
     def mode_list():
-        return redeclipse.versions.default.modes.keys()
+        return [mode for mode in
+                redeclipse.versions.default.modes.keys()
+                if mode not in [
+                    "demo", "edit"
+                    ]
+                ]
 
     @staticmethod
     def count():
@@ -314,12 +319,17 @@ class Mode:
         return [Mode(name) for name in Mode.mode_list()]
 
     def __init__(self, name):
+        re = redeclipse.versions.default
         self.name = name
+        self.longname = re.modestr[re.modes[self.name]]
         self.game_ids = [
             r[0] for r in
             Game.query.with_entities(Game.id).filter(
                 db.func.re_mode(Game.id, self.name)).all()
         ]
+
+    def mode_str(self, short=False):
+        return (self.name if short else self.longname)
 
     def games(self, page=0, pagesize=None):
         # Return full Game objects from Mode's game_ids.
@@ -329,6 +339,13 @@ class Mode:
         if not ids:
             return []
         return Game.query.filter(Game.id.in_(ids)).all()
+
+    def recent_games(self, number):
+        ids = reversed(self.game_ids[-number:])
+        if not ids:
+            return []
+        return Game.query.filter(
+            Game.id.in_(ids)).order_by(Game.id.desc()).all()
 
     def games_paginate(self, page, per_page):
         return to_pagination(page, per_page, self.games,
@@ -396,6 +413,13 @@ class Mutator:
         if not ids:
             return []
         return Game.query.filter(Game.id.in_(ids)).all()
+
+    def recent_games(self, number):
+        ids = reversed(self.game_ids[-number:])
+        if not ids:
+            return []
+        return Game.query.filter(
+            Game.id.in_(ids)).order_by(Game.id.desc()).all()
 
     def games_paginate(self, page, per_page):
         return to_pagination(page, per_page, self.games,

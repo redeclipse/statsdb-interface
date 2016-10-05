@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% import 'utils/time.html' as timeutils %}
+{% import 'utils/redeclipse.html' as redeclipse %}
+{% set current_display = "modes" %}
+
+{% block title %}Modes{% endblock title %}
+
+{% block content %}
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th>Mode</th>
+                <th>Games</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for mode in modes %}
+                <tr>
+                    <td>{{ redeclipse.fancy_mode(mode, 32) }}</td>
+                    <td>{{ mode.game_ids|count }}</td>
+                <tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock content %}

@@ -123,4 +123,32 @@ def display_map_games(name):
     return render_template('displays/map_games.html', map=map,
                            pager=pager)
 
+
+@bp.route("/modes")
+def display_modes():
+    ret = render_template('displays/modes.html',
+                          modes=sorted(extmodels.Mode.all(),
+                                       key=lambda m: len(m.game_ids),
+                                       reverse=True))
+    return ret
+
+
+@bp.route("/mode/<string:name>")
+@bp.route("/modes/<string:name>")
+def display_mode(name):
+    mode = extmodels.Mode.get_or_404(name)
+    return render_template('displays/mode.html', mode=mode)
+
+
+@bp.route("/mode:games/<string:name>")
+def display_mode_games(name):
+    mode = extmodels.Mode.get_or_404(name)
+    pager = models.Game.query.filter(
+            models.Game.id.in_(mode.game_ids)).order_by(
+            models.Game.id.desc()).paginate(
+            request.args.get("page", default=1, type=int),
+            config.DISPLAY_RESULTS_PER_PAGE)
+    return render_template('displays/mode_games.html', mode=mode,
+                           pager=pager)
+
 templateutils.setup(bp)

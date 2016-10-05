@@ -150,7 +150,7 @@ class RE_1_5_dev(RE):
     # Fancy Mode Names
     modestr = [
         "Demo", "Editing", "Deathmatch",
-        "Capture", "Defend", "Bomber Ball", "Race"
+        "Capture the Flag", "Defend and Control", "Bomber Ball", "Race"
     ]
 
 default = get_version_class(DEFAULT_VERSION)

@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% import 'utils/time.html' as timeutils %}
+{% import 'utils/redeclipse.html' as redeclipse %}
+{% set current_display = "modes" %}
+
+{% block title %}Mode: {{ mode.longname }}{% endblock title %}
+
+{% block content %}
+    <h3>{{ mode.longname }}</h3>
+    <p>{{ mode.game_ids|count }} games total.</p>
+    {% set games = mode.recent_games(config.DISPLAY_RESULTS_RECENT) %}
+    {% include 'tables/games.html' %}
+    <a href="{{ url_for('.display_mode_games', name=mode.name) }}" class="btn btn-default pull-right">More...</a>
+{% endblock content %}

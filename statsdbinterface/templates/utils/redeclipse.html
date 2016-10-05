@@ -4,8 +4,12 @@
     <img src="{{ url_for('static', filename='images/teams/%d.png' % team.team) }}" alt="{{ team.name }}" title="{{ team.name }}" width="{{ size }}" height="{{ size }}">
 {%- endmacro %}
 
-{% macro fancy_mode(game, size=24) -%}
-    <img src="{{ url_for('static', filename='images/modes/%s.png' % game.mode_str(True)) }}" alt="{{ game.mode_str() }}" title="{{ game.mode_str() }}" width="{{ size }}" height="{{ size }}">
+{% macro fancy_game_mode(game, size=24) -%}
+    <a href="{{ url_for('.display_mode', name=game.mode_str(True)) }}"><img src="{{ url_for('static', filename='images/modes/%s.png' % game.mode_str(True)) }}" alt="{{ game.mode_str() }}" title="{{ game.mode_str() }}" width="{{ size }}" height="{{ size }}"></a>
+{%- endmacro %}
+
+{% macro fancy_mode(mode, size=24) -%}
+    <a href="{{ url_for('.display_mode', name=mode.name) }}"><img src="{{ url_for('static', filename='images/modes/%s.png' % mode.mode_str(True)) }}" alt="{{ mode.mode_str() }}" title="{{ mode.mode_str() }}" width="{{ size }}" height="{{ size }}"></a>
 {%- endmacro %}
 
 {% macro fancy_mutators(game, maxlong=3) -%}
