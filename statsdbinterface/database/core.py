@@ -1,7 +1,6 @@
 from flask_sqlalchemy import SQLAlchemy
 import inspect
 import traceback
-import config
 
 
 db_functions = []
@@ -35,10 +34,6 @@ def setup_db(app):
     # initialize Flask-SQLAlchemy following app factory pattern
     # http://flask.pocoo.org/docs/0.11/patterns/appfactories/
     db.init_app(app)
-
-    # Set the SQLAlchemy Database URI from the config.
-    app.config['SQLALCHEMY_DATABASE_URI'] = (
-        'sqlite:///%s/stats.sqlite' % (config.data_directory.rstrip('/')))
 
     # Create the SQLAlchemy connection.
 

@@ -1,7 +1,8 @@
 from flask import Flask
+from . import defaults
 
 
-def create_app(config):
+def create_app(data_dir):
     """
     Implementation of the app factory pattern.
 
@@ -12,7 +13,16 @@ def create_app(config):
     """
 
     app = Flask(__name__)
-    app.config.from_object(config)
+    app.config.from_object(defaults)
+    try:
+        import config
+        app.config.from_object(config)
+    except ImportError:
+        # No config.py, just use the defaults.
+        pass
+
+    app.config['SQLALCHEMY_DATABASE_URI'] = (
+        'sqlite:///%s/stats.sqlite' % (data_dir.rstrip('/')))
 
     # Load the rest of the program.
     from .database.core import setup_db

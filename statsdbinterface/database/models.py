@@ -282,12 +282,12 @@ class GamePlayer(db.Model):
 
     def bombings(self):
         return [b.to_dict() for b in GameBombing.query.filter(
-            and_(GameBombing.game == self.game_id,
+            and_(GameBombing.game_id == self.game_id,
                 GameBombing.player == self.wid)).all()]
 
     def captures(self):
         return [b.to_dict() for b in GameCapture.query.filter(
-            and_(GameCapture.game == self.game_id,
+            and_(GameCapture.game_id == self.game_id,
                 GameCapture.player == self.wid)).all()]
 
     def damage(self):

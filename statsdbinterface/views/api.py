@@ -1,8 +1,7 @@
 import math
-from flask import jsonify, request, Blueprint
+from flask import jsonify, request, Blueprint, current_app
 from werkzeug.exceptions import NotFound
 from ..database import models, extmodels
-import config
 
 
 # api blueprint
@@ -16,10 +15,11 @@ def api_config():
     """
 
     return jsonify({
-        "api_results_per_page": config.API_RESULTS_PER_PAGE,
-        "api_highscore_results": config.API_HIGHSCORE_RESULTS,
-        "display_results_per_page": config.DISPLAY_RESULTS_PER_PAGE,
-        "display_results_recent": config.DISPLAY_RESULTS_RECENT,
+        "api_results_per_page": current_app.config['API_RESULTS_PER_PAGE'],
+        "api_highscore_results": current_app.config['API_HIGHSCORE_RESULTS'],
+        "display_results_per_page":
+            current_app.config['DISPLAY_RESULTS_PER_PAGE'],
+        "display_results_recent": current_app.config['DISPLAY_RESULTS_RECENT'],
     })
 
 
@@ -32,7 +32,8 @@ def api_count_games():
     rowcount = models.Game.query.count()
     return jsonify({
         "rows": rowcount,
-        "pages": math.ceil(rowcount / config.API_RESULTS_PER_PAGE),
+        "pages": math.ceil(
+            rowcount / current_app.config['API_RESULTS_PER_PAGE']),
     })
 
 
@@ -41,7 +42,8 @@ def api_count_players():
     rowcount = extmodels.Player.count()
     return jsonify({
         "rows": rowcount,
-        "pages": math.ceil(rowcount / config.API_RESULTS_PER_PAGE),
+        "pages": math.ceil(
+            rowcount / current_app.config['API_RESULTS_PER_PAGE']),
     })
 
 
@@ -51,7 +53,8 @@ def api_count_player_games(handle):
     rowcount = len(player.game_ids)
     return jsonify({
         "rows": rowcount,
-        "pages": math.ceil(rowcount / config.API_RESULTS_PER_PAGE),
+        "pages": math.ceil(
+            rowcount / current_app.config['API_RESULTS_PER_PAGE']),
     })
 
 
@@ -60,7 +63,8 @@ def api_count_servers():
     rowcount = extmodels.Server.count()
     return jsonify({
         "rows": rowcount,
-        "pages": math.ceil(rowcount / config.API_RESULTS_PER_PAGE),
+        "pages": math.ceil(
+            rowcount / current_app.config['API_RESULTS_PER_PAGE']),
     })
 
 
@@ -70,7 +74,8 @@ def api_count_server_games(handle):
     rowcount = len(server.game_ids)
     return jsonify({
         "rows": rowcount,
-        "pages": math.ceil(rowcount / config.API_RESULTS_PER_PAGE),
+        "pages": math.ceil(
+            rowcount / current_app.config['API_RESULTS_PER_PAGE']),
     })
 
 
@@ -79,7 +84,8 @@ def api_count_maps():
     rowcount = extmodels.Map.count()
     return jsonify({
         "rows": rowcount,
-        "pages": math.ceil(rowcount / config.API_RESULTS_PER_PAGE),
+        "pages": math.ceil(
+            rowcount / current_app.config['API_RESULTS_PER_PAGE']),
     })
 
 
@@ -89,7 +95,8 @@ def api_count_map_games(name):
     rowcount = len(map_.game_ids)
     return jsonify({
         "rows": rowcount,
-        "pages": math.ceil(rowcount / config.API_RESULTS_PER_PAGE),
+        "pages": math.ceil(
+            rowcount / current_app.config['API_RESULTS_PER_PAGE']),
     })
 
 
@@ -102,7 +109,7 @@ def api_games():
     # Get a list of games sorted by id and offset by the page.
     games = models.Game.query.order_by(models.Game.id).paginate(
         request.args.get("page", default=1, type=int),
-        config.API_RESULTS_PER_PAGE).items
+        current_app.config['API_RESULTS_PER_PAGE']).items
 
     # Return the list via json.
     ret = []
@@ -150,7 +157,7 @@ def api_players():
     # Get the player list.
     players = extmodels.Player.paginate(
         request.args.get("page", default=1, type=int),
-        config.API_RESULTS_PER_PAGE).items
+        current_app.config['API_RESULTS_PER_PAGE']).items
 
     # Return the list via json.
     ret = []
@@ -182,7 +189,7 @@ def api_player_games(handle):
     resp = jsonify(games=[
         g.to_dict() for g in player.games_paginate(
             request.args.get("page", default=1, type=int),
-            config.API_RESULTS_PER_PAGE).items
+            current_app.config['API_RESULTS_PER_PAGE']).items
     ])
 
     return resp
@@ -255,7 +262,7 @@ def api_servers():
     # Get the server list.
     servers = extmodels.Server.paginate(
         request.args.get("page", default=1, type=int),
-        config.API_RESULTS_PER_PAGE).items
+        current_app.config['API_RESULTS_PER_PAGE']).items
 
     # Return the list via json.
     ret = []
@@ -292,7 +299,7 @@ def api_server_games(handle):
         g.to_dict() for g in
         server.games_paginate(
             request.args.get("page", default=1, type=int),
-            config.API_RESULTS_PER_PAGE).items
+            current_app.config['API_RESULTS_PER_PAGE']).items
     ])
 
     return resp
@@ -307,7 +314,7 @@ def api_maps():
     # Get the map list.
     maps = extmodels.Map.paginate(
         request.args.get("page", default=1, type=int),
-        config.API_RESULTS_PER_PAGE).items
+        current_app.config['API_RESULTS_PER_PAGE']).items
 
     # Return the list via json.
     ret = []
@@ -343,7 +350,7 @@ def api_map_games(name):
         {
             "games": [g.to_dict() for g in map_.games_paginate(
                 request.args.get("page", default=1, type=int),
-                config.API_RESULTS_PER_PAGE).items
+                current_app.config['API_RESULTS_PER_PAGE']).items
             ]
         }
     )

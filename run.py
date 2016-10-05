@@ -9,8 +9,6 @@ from tornado.ioloop import IOLoop
 
 from statsdbinterface import app_factory
 
-import config
-
 
 if __name__ == "__main__":
     # Check for data_directory argument.
@@ -27,18 +25,15 @@ if __name__ == "__main__":
     if not os.path.isfile(os.path.join(data_dir, "stats.sqlite")):
         raise RuntimeError("Could not find stats.sqlite in %s" % data_dir)
 
-    # Set data_directory variable from arguments.
-    config.data_directory = data_dir
-
     # Create a new Flask app instance and apply the configuration
-    app = app_factory.create_app(config)
+    app = app_factory.create_app(data_dir)
 
     # Start server
-    if config.DEBUG:
+    if app.config['DEBUG']:
         # Use Flask's debugging server.
-        app.run(host=config.HOST, port=config.PORT, debug=True)
+        app.run(host=app.config['HOST'], port=app.config['PORT'], debug=True)
     else:
         # Use Tornado's HTTPServer.
         http_server = HTTPServer(WSGIContainer(app))
-        http_server.listen(address=config.HOST, port=config.PORT)
+        http_server.listen(address=app.config['HOST'], port=app.config['PORT'])
         IOLoop.instance().start()

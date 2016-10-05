@@ -1,10 +1,9 @@
+from flask import current_app
 from werkzeug.exceptions import NotFound
 from .core import db
 from .models import Game, GamePlayer, GameServer, GameWeapon
 from .modelutils import direct_to_dict, to_pagination
 from .. import redeclipse
-
-import config
 
 
 class Player:
@@ -273,7 +272,7 @@ class Map:
                 .filter(db.func.re_mode(GamePlayer.game_id, 'race'))
                 .filter(db.func.re_mut(GamePlayer.game_id, 'timed'))
                 # No freestyle.
-                .filter(not db.func.re_mut(GamePlayer.game_id, 'freestyle'))
+                .filter(~db.func.re_mut(GamePlayer.game_id, 'freestyle'))
                 # Scores of 0 indicate the race was never completed.
                 .filter(GamePlayer.score > 0)
                 # Get only the best score from each handle.
@@ -281,7 +280,7 @@ class Map:
                 .having(db.func.min(GamePlayer.score))
                 # Finally: order, limit, and fetch.
                 .order_by(GamePlayer.score.asc())
-                .limit(config.API_HIGHSCORE_RESULTS)
+                .limit(current_app.config['API_HIGHSCORE_RESULTS'])
                 .all()
             )
         ]

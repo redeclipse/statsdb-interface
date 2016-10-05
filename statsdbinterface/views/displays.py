@@ -1,4 +1,4 @@
-import config
+from flask import current_app
 from flask import Blueprint, render_template, send_from_directory, request
 
 from ..database import models, extmodels
@@ -17,7 +17,7 @@ def static(path):
 @bp.route("/")
 def display_dashboard():
     games = models.Game.query.order_by(models.Game.id.desc()).limit(
-        config.DISPLAY_RESULTS_RECENT).all()
+        current_app.config['DISPLAY_RESULTS_RECENT']).all()
     return render_template('displays/dashboard.html', games=games)
 
 
@@ -25,7 +25,7 @@ def display_dashboard():
 def display_games():
     pager = models.Game.query.order_by(models.Game.id.desc()).paginate(
             request.args.get("page", default=1, type=int),
-            config.DISPLAY_RESULTS_PER_PAGE)
+            current_app.config['DISPLAY_RESULTS_PER_PAGE'])
 
     return render_template('displays/games.html', pager=pager,
                            Game=models.Game)
@@ -50,7 +50,7 @@ def display_game(gameid):
 def display_servers():
     pager = extmodels.Server.paginate(
         request.args.get("page", default=1, type=int),
-        config.DISPLAY_RESULTS_PER_PAGE)
+        current_app.config['DISPLAY_RESULTS_PER_PAGE'])
 
     ret = render_template('displays/servers.html', pager=pager)
     return ret
@@ -70,7 +70,7 @@ def display_server_games(handle):
             models.Game.id.in_(server.game_ids)).order_by(
             models.Game.id.desc()).paginate(
             request.args.get("page", default=1, type=int),
-            config.DISPLAY_RESULTS_PER_PAGE)
+            current_app.config['DISPLAY_RESULTS_PER_PAGE'])
     return render_template('displays/server_games.html', server=server,
                            pager=pager)
 
@@ -79,7 +79,7 @@ def display_server_games(handle):
 def display_players():
     pager = extmodels.Player.paginate(
         request.args.get("page", default=1, type=int),
-        config.DISPLAY_RESULTS_PER_PAGE)
+        current_app.config['DISPLAY_RESULTS_PER_PAGE'])
 
     ret = render_template('displays/players.html', pager=pager)
     return ret
@@ -118,7 +118,7 @@ def display_player_games(handle):
             models.Game.id.in_(player.game_ids)).order_by(
             models.Game.id.desc()).paginate(
             request.args.get("page", default=1, type=int),
-            config.DISPLAY_RESULTS_PER_PAGE)
+            current_app.config['DISPLAY_RESULTS_PER_PAGE'])
     return render_template('displays/player_games.html', player=player,
                            pager=pager)
 
@@ -127,7 +127,7 @@ def display_player_games(handle):
 def display_maps():
     pager = extmodels.Map.paginate(
         request.args.get("page", default=1, type=int),
-        config.DISPLAY_RESULTS_PER_PAGE)
+        current_app.config['DISPLAY_RESULTS_PER_PAGE'])
 
     ret = render_template('displays/maps.html', pager=pager)
     return ret
@@ -147,7 +147,7 @@ def display_map_games(name):
             models.Game.id.in_(map.game_ids)).order_by(
             models.Game.id.desc()).paginate(
             request.args.get("page", default=1, type=int),
-            config.DISPLAY_RESULTS_PER_PAGE)
+            current_app.config['DISPLAY_RESULTS_PER_PAGE'])
     return render_template('displays/map_games.html', map=map,
                            pager=pager)
 
@@ -175,7 +175,7 @@ def display_mode_games(name):
             models.Game.id.in_(mode.game_ids)).order_by(
             models.Game.id.desc()).paginate(
             request.args.get("page", default=1, type=int),
-            config.DISPLAY_RESULTS_PER_PAGE)
+            current_app.config['DISPLAY_RESULTS_PER_PAGE'])
     return render_template('displays/mode_games.html', mode=mode,
                            pager=pager)
 
@@ -203,7 +203,7 @@ def display_mutator_games(name):
             models.Game.id.in_(mutator.game_ids)).order_by(
             models.Game.id.desc()).paginate(
             request.args.get("page", default=1, type=int),
-            config.DISPLAY_RESULTS_PER_PAGE)
+            current_app.config['DISPLAY_RESULTS_PER_PAGE'])
     return render_template('displays/mutator_games.html', mutator=mutator,
                            pager=pager)
 

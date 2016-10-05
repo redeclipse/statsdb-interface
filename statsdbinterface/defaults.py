@@ -1,7 +1,5 @@
-# Set these manually.
-
 # Set to True to enable debug functions such as Flask's debugging server.
-DEBUG = True
+DEBUG = False
 
 # Bind the web server to this host.
 HOST = '0.0.0.0'
@@ -19,9 +17,3 @@ DISPLAY_RESULTS_PER_PAGE = 15
 
 # Number of results to return in a 'recent' list.
 DISPLAY_RESULTS_RECENT = 10
-
-
-# These are set in other parts of the program.
-
-# Directory containing stats.sqlite (probably the master server home).
-data_directory = None
