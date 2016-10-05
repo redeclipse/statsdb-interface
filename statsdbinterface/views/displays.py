@@ -2,6 +2,7 @@ import config
 from flask import Blueprint, render_template, send_from_directory, request
 
 from ..database import models, extmodels
+from ..database.core import db
 from . import templateutils
 
 # displays blueprint
@@ -34,7 +35,15 @@ def display_games():
 @bp.route("/games/<int:gameid>")
 def display_game(gameid):
     game = models.Game.query.filter_by(id=gameid).first_or_404()
-    return render_template('displays/game.html', game=game)
+    weapons = extmodels.Weapon.all_from_game(game.id)
+    return render_template('displays/game.html', game=game,
+                           weapons=weapons,
+                           totalwielded=(models.GameWeapon.query
+                                         .with_entities(db.func.sum(
+                                             models.GameWeapon.timewielded))
+                                         .filter(models.GameWeapon
+                                                 .game_id == game.id)
+                                         .first()[0]))
 
 
 @bp.route("/servers")
@@ -80,7 +89,26 @@ def display_players():
 @bp.route("/players/<string:handle>")
 def display_player(handle):
     player = extmodels.Player.get_or_404(handle)
-    return render_template('displays/player.html', player=player)
+    games = (models.Game.query
+             .with_entities(models.Game.id)
+             .filter(~db.func.re_mode(models.Game.id, 'race'))
+             .filter(~db.func.re_mut(models.Game.id, 'insta'))
+             .filter(~db.func.re_mut(models.Game.id, 'medieval'))
+             .filter(models.Game.id.in_(player.game_ids))
+             .order_by(models.Game.id.desc()).limit(50))
+    weapons = extmodels.Weapon.all_from_player_games(handle, games)
+    return render_template('displays/player.html',
+                           player=player,
+                           weapons=weapons,
+                           totalwielded=(models.GameWeapon.query
+                                         .with_entities(db.func.sum(
+                                             models.GameWeapon.timewielded))
+                                         .filter(models.GameWeapon.game_id.in_(
+                                             games
+                                             ))
+                                         .filter(models.GameWeapon
+                                                 .playerhandle == handle)
+                                         .first()[0]))
 
 
 @bp.route("/player:games/<string:handle>")
@@ -178,5 +206,28 @@ def display_mutator_games(name):
             config.DISPLAY_RESULTS_PER_PAGE)
     return render_template('displays/mutator_games.html', mutator=mutator,
                            pager=pager)
+
+
+@bp.route("/weapons")
+def display_weapons():
+    games = (models.Game.query
+             .with_entities(models.Game.id)
+             .filter(~db.func.re_mode(models.Game.id, 'race'))
+             .filter(~db.func.re_mut(models.Game.id, 'insta'))
+             .filter(~db.func.re_mut(models.Game.id, 'medieval'))
+             .order_by(models.Game.id.desc()).limit(300))
+    weapons = extmodels.Weapon.all_from_games(games)
+
+    ret = render_template('displays/weapons.html',
+                          weapons=weapons,
+                          totalwielded=(models.GameWeapon.query
+                                        .with_entities(db.func.sum(
+                                            models.GameWeapon.timewielded))
+                                        .filter(models.GameWeapon.game_id.in_(
+                                            games
+                                            ))
+                                        .first()[0])
+                          )
+    return ret
 
 templateutils.setup(bp)

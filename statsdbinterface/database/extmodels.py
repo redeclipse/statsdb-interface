@@ -272,6 +272,8 @@ class Map:
                 # Only timed race.
                 .filter(db.func.re_mode(GamePlayer.game_id, 'race'))
                 .filter(db.func.re_mut(GamePlayer.game_id, 'timed'))
+                # No freestyle.
+                .filter(not db.func.re_mut(GamePlayer.game_id, 'freestyle'))
                 # Scores of 0 indicate the race was never completed.
                 .filter(GamePlayer.score > 0)
                 # Get only the best score from each handle.
@@ -467,10 +469,23 @@ class Weapon:
                 GameWeapon.playerhandle == player))
 
     @staticmethod
+    def from_player_games(weapon, player, games):
+        return Weapon.finish_query(weapon, GameWeapon.query.filter(
+            GameWeapon.weapon == weapon).filter(
+                GameWeapon.playerhandle == player).filter(
+                    GameWeapon.game_id.in_(games)))
+
+    @staticmethod
     def from_game(weapon, game):
         return Weapon.finish_query(weapon, GameWeapon.query.filter(
             GameWeapon.weapon == weapon).filter(
                 GameWeapon.game_id == game))
+
+    @staticmethod
+    def from_games(weapon, games):
+        return Weapon.finish_query(weapon, GameWeapon.query.filter(
+            GameWeapon.weapon == weapon).filter(
+                GameWeapon.game_id.in_(games)))
 
     @staticmethod
     def from_game_player(weapon, game, player):
@@ -496,8 +511,25 @@ class Weapon:
     def all():
         return [Weapon.from_weapon(n) for n in Weapon.weapon_list()]
 
+    @staticmethod
+    def all_from_games(games):
+        return [Weapon.from_games(n, games) for n in Weapon.weapon_list()]
+
+    @staticmethod
+    def all_from_game(game):
+        return [Weapon.from_game(n, game) for n in Weapon.weapon_list()]
+
+    @staticmethod
+    def all_from_player_games(player, games):
+        return [Weapon.from_player_games(n, player, games)
+                for n in Weapon.weapon_list()]
+
     def __init__(self, name):
         self.name = name
+
+    def is_not_wielded(self):
+        re = redeclipse.versions.default
+        return self.name in re.notwielded
 
     def to_dict(self):
         return direct_to_dict(self, [

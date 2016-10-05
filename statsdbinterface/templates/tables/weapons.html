@@ -1,0 +1,29 @@
+{% import 'utils/redeclipse.html' as redeclipse %}
+
+<table class="table table-hover">
+    <thead>
+        <tr>
+            <th>Weapon</th>
+            <th>Loadout</th>
+            <th>Wielded</th>
+            <th><span title="Damage per Minute">DPM</span></th>
+            <th><span title="Frags per Minute">FPM</span></th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for weapon in weapons %}
+            <tr>
+                <td>{{ redeclipse.fancy_weapon(weapon.name) }}</td>
+                <td>{{ (weapon.timeloadout / (totalwielded|sdiv) * 100)|round(0)|int }}%</td>
+                <td>{{ (weapon.timewielded / (totalwielded|sdiv) * 100)|round(0)|int }}%</td>
+                {% if weapon.is_not_wielded() %}
+                    {% set weapon_time = weapon.timeloadout %}
+                {% else %}
+                    {% set weapon_time = weapon.timewielded %}
+                {% endif %}
+                <td><span title="{{ ((weapon.damage1) / ((weapon_time|sdiv) / 60))|round(0)|int }} + {{ ((weapon.damage2) / ((weapon_time|sdiv) / 60))|round(0)|int }}">{{ ((weapon.damage1 + weapon.damage2) / ((weapon_time|sdiv) / 60))|round(0)|int }}</span></td>
+                <td><span title="{{ ((weapon.frags1) / ((weapon_time|sdiv) / 60))|round(1) }} + {{ ((weapon.frags2) / ((weapon_time|sdiv) / 60))|round(1) }}">{{ ((weapon.frags1 + weapon.frags2) / ((weapon_time|sdiv) / 60))|round(1) }}</span></td>
+            <tr>
+        {% endfor %}
+    </tbody>
+</table>

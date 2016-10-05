@@ -11,4 +11,6 @@
     {% set games = player.recent_games(config.DISPLAY_RESULTS_RECENT) %}
     {% include 'tables/player_games.html' %}
     <a href="{{ url_for('.display_player_games', handle=player.handle) }}" class="btn btn-default pull-right">More...</a>
+    <h4>From the last 50 games</h4>
+    {% include 'tables/weapons.html' %}
 {% endblock content %}

@@ -83,7 +83,7 @@
                         <td>{{ round.round }}</td>
                         <td>{{ redeclipse.wid_to_player(game, round.winner) }}</td>
                         <td>
-                            <ul class="delim-list delim-separated-list">
+                            <ul class="delim-list semicolon-delim-list">
                                 {%- for wid in round.players %}
                                     <li>{{ redeclipse.wid_to_player(game, wid) }}</li>
                                 {%- endfor %}
@@ -133,5 +133,8 @@
                 {% endfor %}
             </tbody>
         </table>
+    {% endif %}
+    {% if not game.is_peaceful() %}
+        {% include 'tables/weapons.html' %}
     {% endif %}
 {% endblock content %}

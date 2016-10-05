@@ -18,8 +18,12 @@
     </ul>
 {%- endmacro %}
 
+{% macro fancy_weapon(weapon, size=24) -%}
+    <span><img src="{{ url_for('static', filename='images/weapons/%s.png' % weapon) }}" alt="{{ weapon }}" title="{{ weapon }}" width="{{ size }}" height="{{ size }}">{{ weapon }}</span>
+{%- endmacro %}
+
 {% macro per_minute(player, value) -%}
-    <span title="{{ (value / ((player.timealive|sdiv) / 60))|round(1) }} per minute">{{ value }}</span>
+    <span title="{{ (value / ((player.timealive|sdiv) / 60))|round(0)|int }} per minute">{{ value }}</span>
 {%- endmacro %}
 
 {% macro wid_to_player(game, wid) -%}{% if game.player_by_wid(wid) %}<span>{{ game.player_by_wid(wid).name }}</span>{% else %}<span><i>nobody</i></span>{% endif %}{%- endmacro %}
