@@ -151,4 +151,32 @@ def display_mode_games(name):
     return render_template('displays/mode_games.html', mode=mode,
                            pager=pager)
 
+
+@bp.route("/mutators")
+def display_mutators():
+    ret = render_template('displays/mutators.html',
+                          mutators=sorted(extmodels.Mutator.all(),
+                                          key=lambda m: len(m.game_ids),
+                                          reverse=True))
+    return ret
+
+
+@bp.route("/mutator/<string:name>")
+@bp.route("/mutators/<string:name>")
+def display_mutator(name):
+    mutator = extmodels.Mutator.get_or_404(name)
+    return render_template('displays/mutator.html', mutator=mutator)
+
+
+@bp.route("/mutator:games/<string:name>")
+def display_mutator_games(name):
+    mutator = extmodels.Mutator.get_or_404(name)
+    pager = models.Game.query.filter(
+            models.Game.id.in_(mutator.game_ids)).order_by(
+            models.Game.id.desc()).paginate(
+            request.args.get("page", default=1, type=int),
+            config.DISPLAY_RESULTS_PER_PAGE)
+    return render_template('displays/mutator_games.html', mutator=mutator,
+                           pager=pager)
+
 templateutils.setup(bp)

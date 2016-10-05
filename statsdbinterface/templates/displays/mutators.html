@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% import 'utils/time.html' as timeutils %}
+{% import 'utils/redeclipse.html' as redeclipse %}
+{% set current_display = "mutators" %}
+
+{% block title %}Mutators{% endblock title %}
+
+{% block content %}
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th>Mutator</th>
+                <th>Games</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for mutator in mutators %}
+                <tr>
+                    <td><a href="{{ url_for('.display_mutator', name=mutator.name) }}">{{ mutator.name }}</a></td>
+                    <td>{{ mutator.game_ids|count }}</td>
+                <tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock content %}

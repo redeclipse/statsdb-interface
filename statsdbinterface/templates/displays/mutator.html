@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% import 'utils/time.html' as timeutils %}
+{% import 'utils/redeclipse.html' as redeclipse %}
+{% set current_display = "mutators" %}
+
+{% block title %}Mutator: {{ mutator.name }}{% endblock title %}
+
+{% block content %}
+    <h3>{{ mutator.name }}</h3>
+    <p>{{ mutator.game_ids|count }} games total.</p>
+    {% set games = mutator.recent_games(config.DISPLAY_RESULTS_RECENT) %}
+    {% include 'tables/games.html' %}
+    <a href="{{ url_for('.display_mutator_games', name=mutator.name) }}" class="btn btn-default pull-right">More...</a>
+{% endblock content %}

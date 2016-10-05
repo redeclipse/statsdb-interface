@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% set current_display = "mutators" %}
+
+{% block title %}Mutator Games: {{ mutator.name }}{% endblock title %}
+
+{% block content %}
+    <h3><a href="{{ url_for('.display_mutator', name=mutator.name) }}">{{ mutator.name }}</a></h3>
+    {% set games = pager.items %}
+    {% include 'tables/games.html' %}
+{% endblock content %}

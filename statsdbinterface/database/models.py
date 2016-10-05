@@ -185,6 +185,35 @@ class Game(db.Model):
                                   (maxlong and len(self.re().mutslist(
                                    self.mode, self.mutators)) > maxlong))
 
+    def mutator_dict_list(self, maxlong=0):
+        ret = []
+        re = self.re()
+
+        for m in re.basemuts:
+            if (self.mutators & re.basemuts[m]):
+                ret.append({
+                    "link": m,
+                    "name": m,
+                    "longname": m,
+                    "shortname": re.shortmutators[m],
+                    })
+
+        if self.mode in re.gspmuts:
+            for m in re.gspmuts[self.mode]:
+                if (self.mutators & re.gspmuts[self.mode][m]):
+                    mn = re.cmodestr[self.mode] + '-' + m
+                    ret.append({
+                        "link": mn,
+                        "name": m,
+                        "longname": m,
+                        "shortname": re.shortmutators[m],
+                    })
+
+        if maxlong and len(ret) > maxlong:
+            for m in ret:
+                m["name"] = m["shortname"]
+        return ret
+
     def ordered_players(self):
         if self.is_timed():
             return (self.players.order_by(
