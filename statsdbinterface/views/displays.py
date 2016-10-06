@@ -136,6 +136,17 @@ def display_maps():
     return ret
 
 
+@bp.route("/racemaps")
+def display_racemaps():
+    pager = extmodels.Map.paginate(
+        request.args.get("page", default=1, type=int),
+        current_app.config['DISPLAY_RESULTS_PER_PAGE'],
+        race=True)
+
+    ret = render_template('displays/racemaps.html', pager=pager)
+    return ret
+
+
 @bp.route("/map/<string:name>")
 @bp.route("/maps/<string:name>")
 def display_map(name):

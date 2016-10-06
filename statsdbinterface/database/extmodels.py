@@ -178,7 +178,14 @@ class Server:
 
 class Map:
     @staticmethod
-    def map_list():
+    def map_list(race=False):
+        if race:
+            return [r[0] for r in
+                    Game.query.with_entities(Game.map)
+                    .filter(db.func.re_mode(Game.id, 'race'))
+                    .filter(db.func.re_mut(Game.id, 'timed'))
+                    .group_by(Game.map)
+                    .order_by(Game.id.desc()).all()]
         # Return a list of all map names in the database.
         return [r[0] for r in
                 Game.query.with_entities(Game.map).group_by(Game.map)
@@ -199,9 +206,9 @@ class Map:
             raise NotFound
 
     @staticmethod
-    def all(page=0, pagesize=None):
+    def all(page=0, pagesize=None, race=False):
         # Return all m, with optional paging.
-        filtered_names = names = Map.map_list()
+        filtered_names = names = Map.map_list(race)
         # If pagesize is specified, only return page <page> from the list.
         if pagesize is not None:
             filtered_names = names[
@@ -209,8 +216,9 @@ class Map:
         return [Map(name) for name in filtered_names]
 
     @classmethod
-    def paginate(cls, page, per_page):
-        return to_pagination(page, per_page, cls.all, cls.count)
+    def paginate(cls, page, per_page, race=False):
+        return to_pagination(page, per_page,
+                             lambda a, b: cls.all(a, b, race), cls.count)
 
     def __init__(self, name):
         # Build a Map object from the database.
@@ -246,7 +254,7 @@ class Map:
         return to_pagination(page, per_page, self.games,
                              lambda: len(self.game_ids))
 
-    def topraces(self):
+    def topraces(self, endurance=False):
         # Return a dictionary of the top race times.
         return [
             {
@@ -271,6 +279,9 @@ class Map:
                 # Only timed race.
                 .filter(db.func.re_mode(GamePlayer.game_id, 'race'))
                 .filter(db.func.re_mut(GamePlayer.game_id, 'timed'))
+                .filter(True
+                        if not endurance else
+                        db.func.re_mut(GamePlayer.game_id, 'endurance'))
                 # No freestyle.
                 .filter(~db.func.re_mut(GamePlayer.game_id, 'freestyle'))
                 # Scores of 0 indicate the race was never completed.
