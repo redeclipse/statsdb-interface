@@ -4,6 +4,7 @@ from .core import db
 from .models import Game, GamePlayer, GameServer, GameWeapon
 from .modelutils import direct_to_dict, to_pagination
 from .. import redeclipse
+from .. function_cache import cached
 
 
 class Player:
@@ -83,6 +84,86 @@ class Player:
         return GamePlayer.query.filter(
                 GamePlayer.game_id == game_id).filter(
                 GamePlayer.handle == self.handle).first()
+
+    def last_games(self, number=0):
+        if number == 0:
+            return list(reversed(self.game_ids))
+        else:
+            return list(reversed(self.game_ids))[:number]
+
+    @cached(5 * 60, 'handle')
+    def dpm(self, games_ago):
+        games = self.last_games(games_ago)
+        d1, d2 = GameWeapon.query.with_entities(
+            db.func.sum(GameWeapon.damage1),
+            db.func.sum(GameWeapon.damage2)).filter(
+                GameWeapon.game_id.in_(games),
+                db.func.re_normal_weapons(GameWeapon.game_id),
+                GameWeapon.playerhandle == self.handle
+                ).first()
+        time = GamePlayer.query.with_entities(
+            db.func.sum(GamePlayer.timealive)).filter(
+                GamePlayer.game_id.in_(games),
+                db.func.re_normal_weapons(GamePlayer.game_id),
+                GamePlayer.handle == self.handle
+                ).first()[0]
+        return ((d1 or 0) + (d2 or 0)) / (max(1, (time or 0)) / 60)
+
+    @cached(5 * 60, 'handle')
+    def fpm(self, games_ago):
+        games = self.last_games(games_ago)
+        time, frags = GamePlayer.query.with_entities(
+            db.func.sum(GamePlayer.timealive),
+            db.func.sum(GamePlayer.frags)).filter(
+                GamePlayer.game_id.in_(games),
+                db.func.re_normal_weapons(GamePlayer.game_id),
+                GamePlayer.handle == self.handle
+                ).first()
+        return (frags or 0) / (max(1, (time or 0)) / 60)
+
+    @cached(5 * 60, 'handle')
+    def kdr(self, games_ago):
+        games = self.last_games(games_ago)
+        frags, deaths = GamePlayer.query.with_entities(
+            db.func.sum(GamePlayer.frags),
+            db.func.sum(GamePlayer.deaths)).filter(
+                GamePlayer.game_id.in_(games),
+                db.func.re_normal_weapons(GamePlayer.game_id),
+                GamePlayer.handle == self.handle
+                ).first()
+        return (frags or 0) / max(1, deaths or 0)
+
+    @cached(5 * 60, 'handle')
+    def dfr(self, games_ago):
+        games = self.last_games(games_ago)
+        d1, d2 = GameWeapon.query.with_entities(
+            db.func.sum(GameWeapon.damage1),
+            db.func.sum(GameWeapon.damage2)).filter(
+                GameWeapon.game_id.in_(games),
+                db.func.re_normal_weapons(GameWeapon.game_id),
+                GameWeapon.playerhandle == self.handle
+                ).first()
+        frags = GamePlayer.query.with_entities(
+            db.func.sum(GamePlayer.frags)).filter(
+                GamePlayer.game_id.in_(games),
+                db.func.re_normal_weapons(GamePlayer.game_id),
+                GamePlayer.handle == self.handle
+                ).first()[0]
+        return ((d1 or 0) + (d2 or 0)) / max(1, frags or 0)
+
+    @cached(5 * 60, 'handle')
+    def topmaps(self, games_ago):
+        games = self.last_games(games_ago)
+        maps = [r[0] for r in (Game.query
+                               .with_entities(Game.map)
+                               .filter(Game.id.in_(games))
+                               )]
+        ret = {}
+        for map_ in set(maps):
+            ret[map_] = maps.count(map_)
+        return [{"name": m, "games": ret[m]}
+                for m in sorted(sorted(ret),
+                                key=lambda m: ret[m], reverse=True)]
 
     def weapons(self):
         ret = {}

@@ -111,7 +111,7 @@ def display_player(handle):
                                              ))
                                          .filter(models.GameWeapon
                                                  .playerhandle == handle)
-                                         .first()[0]))
+                                         .first()[0]) or 0)
 
 
 @bp.route("/player:games/<string:handle>")

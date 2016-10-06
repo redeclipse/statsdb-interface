@@ -7,14 +7,21 @@ cache_lock = Lock()
 cache_cleaner_running = False
 
 
-def cached(seconds):
+def cached(seconds, cattr=None):
     """
     Decorator, registers function to the cache.
     """
     def wrapper(f):
         def function(*args, **kwargs):
             # Construct key from the function id and arguments.
-            key = (id(f), args, tuple(kwargs.items()))
+            if cattr is None:
+                key = (id(f), args, tuple(kwargs.items()))
+            else:
+                # Used for class methods, change args[0] to an attribute.
+                kargs = args[1:]
+                key = (id(f), id(type(args[0])),
+                       getattr(args[0], cattr), kargs,
+                       tuple(kwargs.items()))
             needresults = False
             with cache_lock:
                 if key not in cache:
