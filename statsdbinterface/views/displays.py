@@ -189,7 +189,8 @@ def display_mutators():
     ret = render_template('displays/mutators.html',
                           mutators=sorted(extmodels.Mutator.all(),
                                           key=lambda m: len(m.game_ids),
-                                          reverse=True))
+                                          reverse=True),
+                          rankings=rankings)
     return ret
 
 

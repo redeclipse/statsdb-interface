@@ -120,6 +120,34 @@ def modes_by_games(days):
 
 
 @cached(60)
+def mutators_by_games(days):
+    first_game = first_game_in_days(days)
+    mutators = extmodels.Mutator.mutator_list()
+    ret = []
+    for mutator in mutators:
+        m = {
+            'name': mutator,
+            'link': mutator,
+            'longname': mutator,
+            'games': 0,
+            }
+        if '-' in mutator:
+            mode, mut = mutator.split('-')
+            m['games'] = models.Game.query.filter(
+                db.func.re_mode(models.Game.id, mode),
+                db.func.re_mut(models.Game.id, mut),
+                models.Game.id >= first_game
+                ).count()
+        else:
+            m['games'] = models.Game.query.filter(
+                db.func.re_mut(models.Game.id, mutator),
+                models.Game.id >= first_game
+                ).count()
+        ret.append(m)
+    return sorted(ret, key=lambda m: m['games'], reverse=True)
+
+
+@cached(60)
 def servers_by_games(days):
     first_game = first_game_in_days(days)
     servers = [r[0] for r in models.GameServer.query
