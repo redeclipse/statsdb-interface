@@ -489,6 +489,12 @@ class Weapon:
         return ret
 
     @staticmethod
+    def from_f(weapon, f):
+        ret = Weapon.finish_query(weapon, GameWeapon.query.filter(
+            GameWeapon.weapon == weapon).filter(f))
+        return ret
+
+    @staticmethod
     def from_game_player(weapon, game, player):
         return Weapon.finish_query(weapon, GameWeapon.query.filter(
             GameWeapon.weapon == weapon).filter(
@@ -515,6 +521,10 @@ class Weapon:
     @staticmethod
     def all_from_games(games):
         return [Weapon.from_games(n, games) for n in Weapon.weapon_list()]
+
+    @staticmethod
+    def all_from_f(f):
+        return [Weapon.from_f(n, f) for n in Weapon.weapon_list()]
 
     @staticmethod
     def all_from_game(game):

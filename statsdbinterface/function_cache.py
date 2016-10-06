@@ -15,12 +15,15 @@ def cached(seconds):
         def function(*args, **kwargs):
             # Construct key from the function id and arguments.
             key = (id(f), args, tuple(kwargs.items()))
+            needresults = False
             with cache_lock:
-                if key not in cache or (
-                        (time.time() - cache[key][0]) >= seconds):
-                            cache[key] = (time.time(),
-                                          f(*args, **kwargs), seconds)
-                return cache[key][1]
+                if key not in cache:
+                    needresults = True
+            if needresults:
+                results = f(*args, **kwargs)
+                with cache_lock:
+                    cache[key] = (time.time(), results, seconds)
+            return cache[key][1]
         return function
 
     return wrapper

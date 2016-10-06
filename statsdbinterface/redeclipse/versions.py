@@ -127,6 +127,7 @@ class RE_1_5_dev(RE):
     ]
     weaponlist = ["claw", "pistol"] + loadoutweaponlist + \
                  ["grenade", "mine", "rocket", "melee"]
+    standardweaponlist = ["claw", "pistol"] + loadoutweaponlist + ["melee"]
     notwielded = ["melee"]
 
     # Mode Lists

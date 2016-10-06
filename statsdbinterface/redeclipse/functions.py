@@ -5,14 +5,20 @@ from . import versions
 
 @db_function('re_normal_weapons')
 def re_normal_weapons(game_id):
+    if game_id in re_normal_weapons.cache:
+        return re_normal_weapons.cache[game_id]
     re = versions.get_game_version(game_id)
+    ret = True
     for mode in re.nonstandard_weapons['modes']:
         if re_mode(game_id, mode):
-            return False
+            ret = False
+            break
     for mutator in re.nonstandard_weapons['mutators']:
         if re_mut(game_id, mutator):
-            return False
-    return True
+            ret = False
+            break
+    re_normal_weapons.cache[game_id] = ret
+re_normal_weapons.cache = {}
 
 
 @db_function('re_mode')

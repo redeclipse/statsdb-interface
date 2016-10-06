@@ -8,19 +8,59 @@
     <div class="row">
         <h3>Last 7 days</h3>
         <div class="col-md-3">
-            <h4>Most wielded</h4>
+            <h4>Most games</h4>
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Player</th>
+                        <th>Games</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for player in rankings.players_by_games(7)[:5] %}
+                        <tr>
+                            <td><a href="{{ url_for('.display_player', handle=player.handle) }}">{{ player.handle }}</a></td>
+                            <td>{{ player.games }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="col-md-3">
+            <h4>Most games</h4>
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Server</th>
+                        <th>Games</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for server in rankings.servers_by_games(7)[:5] %}
+                        <tr>
+                            <td><a href="{{ url_for('.display_server', handle=server.handle) }}">{{ server.handle }}</a></td>
+                            <td>{{ server.games }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="col-md-3">
+            <h4>Most <span title="Frags per Minute">FPM</span></h4>
             <table class="table table-hover">
                 <thead>
                     <tr>
                         <th>Weapon</th>
-                        <th>Wielded</th>
+                        <th>Player</th>
+                        <th><span title="Frags per Minute">FPM</span></th>
                     </tr>
                 </thead>
                 <tbody>
-                    {% for weapon in rankings.weapons_by_wielded(7)[:5] %}
+                    {% for entry in rankings.player_weapons(7)[:5] %}
                         <tr>
-                            <td>{{ redeclipse.fancy_weapon(weapon.name) }}</td>
-                            <td>{{ (weapon.timewielded * 100)|round(0)|int }}%</td>
+                            <td>{{ redeclipse.fancy_weapon(entry.weapon) }}</td>
+                            <td><a href="{{ url_for('.display_player', handle=entry.handle) }}">{{ entry.handle }}</a></td>
+                            <td>{{ entry.fpm|round(1) }}</td>
                         </tr>
                     {% endfor %}
                 </tbody>
@@ -30,7 +70,7 @@
     <div class="row">
         <h3>Last 30 days</h3>
         <div class="col-md-3">
-            <h4>Most popular</h4>
+            <h4>Most games</h4>
             <table class="table table-hover">
                 <thead>
                     <tr>
@@ -43,6 +83,44 @@
                         <tr>
                             <td><a href="{{ url_for('.display_map', name=map.name) }}">{{ map.name }}</a></td>
                             <td>{{ map.games }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="col-md-3">
+            <h4>Most wielded</h4>
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Weapon</th>
+                        <th>Wielded</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for weapon in rankings.weapons_by_wielded(30)[:5] %}
+                        <tr>
+                            <td>{{ redeclipse.fancy_weapon(weapon.name) }}</td>
+                            <td>{{ (weapon.timewielded * 100)|round(0)|int }}%</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="col-md-3">
+            <h4>Most <span title="Damage per Minute">DPM</span></h4>
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Player</th>
+                        <th><span title="Damage per Minute">DPM</span></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for player in rankings.players_by_dpm(30)[:5] %}
+                        <tr>
+                            <td><a href="{{ url_for('.display_player', handle=player.handle) }}">{{ player.handle }}</a></td>
+                            <td>{{ player.dpm|round(0)|int }}</td>
                         </tr>
                     {% endfor %}
                 </tbody>
