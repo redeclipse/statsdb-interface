@@ -1,4 +1,5 @@
-from ..database.models import Game
+from ..database.models import Game, GameServer
+from ..database.core import db
 from collections import OrderedDict
 
 
@@ -38,6 +39,15 @@ def get_game_version(game_id):
         game_cache[game_id] = Game.query.filter(
             Game.id == game_id).first().server[0].version
     return get_version_class(game_cache[game_id])
+
+
+def build_precache():
+    for vclass in registry:
+        for r in (Game.query.with_entities(Game.id)
+                  .join(Game.server)
+                  .filter(db.func.re_ver(GameServer.version, vclass.startstr,
+                                         vclass.endstr)).all()):
+                        game_cache[r[0]] = vclass.startstr
 
 
 def reversion(c):
@@ -146,6 +156,11 @@ class RE_1_5_dev(RE):
         modes["race"]: ["timed", "endurance", "gauntlet"],
         modes["dm"]: ["gladiator", "oldschool"],
     }
+
+    nonstandard_weapons = {
+        "modes": ["race"],
+        "mutators": ["insta", "medieval", "gladiator", "kaboom"],
+        }
 
     # Fancy Mode Names
     modestr = [

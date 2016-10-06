@@ -39,4 +39,8 @@ def create_app(data_dir):
     from .error_handling import setup_app
     setup_app(app)
 
+    # Begin cache cleaner.
+    from . import function_cache
+    function_cache.setup()
+
     return app

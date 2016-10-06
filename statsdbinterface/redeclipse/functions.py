@@ -3,6 +3,18 @@ from ..database.models import Game, GameServer
 from . import versions
 
 
+@db_function('re_normal_weapons')
+def re_normal_weapons(game_id):
+    re = versions.get_game_version(game_id)
+    for mode in re.nonstandard_weapons['modes']:
+        if re_mode(game_id, mode):
+            return False
+    for mutator in re.nonstandard_weapons['mutators']:
+        if re_mut(game_id, mutator):
+            return False
+    return True
+
+
 @db_function('re_mode')
 def re_mode(game_id, mode):
     if mode in re_mode.precache and game_id <= re_mode.lastprecache:

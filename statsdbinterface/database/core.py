@@ -49,3 +49,4 @@ def setup_db(app):
 
     with app.app_context():
         redeclipse.functions.build_precache()
+        redeclipse.versions.build_precache()

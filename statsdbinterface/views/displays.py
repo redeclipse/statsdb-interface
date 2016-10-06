@@ -4,6 +4,7 @@ from flask import Blueprint, render_template, send_from_directory, request
 from ..database import models, extmodels
 from ..database.core import db
 from . import templateutils
+from .. import rankings
 
 # displays blueprint
 bp = Blueprint(__name__, __name__)
@@ -18,7 +19,9 @@ def static(path):
 def display_dashboard():
     games = models.Game.query.order_by(models.Game.id.desc()).limit(
         current_app.config['DISPLAY_RESULTS_RECENT']).all()
-    return render_template('displays/dashboard.html', games=games)
+    return render_template('displays/dashboard.html',
+                           games=games,
+                           rankings=rankings)
 
 
 @bp.route("/games")
@@ -212,9 +215,7 @@ def display_mutator_games(name):
 def display_weapons():
     games = (models.Game.query
              .with_entities(models.Game.id)
-             .filter(~db.func.re_mode(models.Game.id, 'race'))
-             .filter(~db.func.re_mut(models.Game.id, 'insta'))
-             .filter(~db.func.re_mut(models.Game.id, 'medieval'))
+             .filter(db.func.re_normal_weapons(models.Game.id))
              .order_by(models.Game.id.desc()).limit(300))
     weapons = extmodels.Weapon.all_from_games(games)
 

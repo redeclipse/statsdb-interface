@@ -1,10 +1,59 @@
 {% extends 'base.html' %}
+{% import 'utils/redeclipse.html' as redeclipse %}
 {% set current_display = "dashboard" %}
 
 {% block title %}Dashboard{% endblock title %}
 
 {% block content %}
-    <h3 class="centering text-center">Recent Games</h3>
-    {% include 'tables/games.html' %}
-    <a href="/games" class="btn btn-default pull-right">More...</a>
+    <div class="row">
+        <h3>Last 7 days</h3>
+        <div class="col-md-3">
+            <h4>Most wielded</h4>
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Weapon</th>
+                        <th>Wielded</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for weapon in rankings.weapons_by_wielded(7)[:5] %}
+                        <tr>
+                            <td>{{ redeclipse.fancy_weapon(weapon.name) }}</td>
+                            <td>{{ (weapon.timewielded * 100)|round(0)|int }}%</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="row">
+        <h3>Last 30 days</h3>
+        <div class="col-md-3">
+            <h4>Most popular</h4>
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Map</th>
+                        <th>Games</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for map in rankings.maps_by_games(30)[:5] %}
+                        <tr>
+                            <td><a href="{{ url_for('.display_map', name=map.name) }}">{{ map.name }}</a></td>
+                            <td>{{ map.games }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="row">
+        <h3>Recent Games</h3>
+        <div class="col-md-12">
+            {% include 'tables/games.html' %}
+            <a href="{{ url_for('.display_games') }}" class="btn btn-default pull-right">More...</a>
+        </div>
+    </div>
 {% endblock content %}

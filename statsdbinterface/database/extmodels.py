@@ -456,9 +456,10 @@ class Weapon:
         weapon = Weapon(name)
         qret = query.with_entities(*[
             db.func.sum(getattr(GameWeapon, c))
-            for c in Weapon.columns]).all()[0]
+            for c in Weapon.columns]).first()
         for c in Weapon.columns:
-            setattr(weapon, c, qret[Weapon.columns.index(c)])
+            value = qret[Weapon.columns.index(c)]
+            setattr(weapon, c, value if value is not None else 0)
         return weapon
 
     @staticmethod
@@ -482,9 +483,10 @@ class Weapon:
 
     @staticmethod
     def from_games(weapon, games):
-        return Weapon.finish_query(weapon, GameWeapon.query.filter(
+        ret = Weapon.finish_query(weapon, GameWeapon.query.filter(
             GameWeapon.weapon == weapon).filter(
                 GameWeapon.game_id.in_(games)))
+        return ret
 
     @staticmethod
     def from_game_player(weapon, game, player):
