@@ -36,14 +36,12 @@
             {% endwith %}
             {% endblock messages %}
 
-
-            <div class="container-fluid">
-                {% block content %}
-                {% endblock content %}
-                {% if pager is defined %}
+            {% block content %}
+            {% endblock content %}
+            
+            {% if pager is defined %}
                 {% include "pager.html" %}
-                {% endif %}
-            </div>
+            {% endif %}
         </div>
 
         {% block scripts %}
