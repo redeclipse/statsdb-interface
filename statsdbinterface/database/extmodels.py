@@ -491,7 +491,7 @@ class Weapon:
     @staticmethod
     def from_f(weapon, f):
         ret = Weapon.finish_query(weapon, GameWeapon.query.filter(
-            GameWeapon.weapon == weapon).filter(f))
+            GameWeapon.weapon == weapon).filter(*f))
         return ret
 
     @staticmethod
@@ -541,6 +541,11 @@ class Weapon:
     def is_not_wielded(self):
         re = redeclipse.versions.default
         return self.name in re.notwielded
+
+    def time(self):
+        if self.is_not_wielded():
+            return self.timeloadout
+        return self.timewielded
 
     def to_dict(self):
         return direct_to_dict(self, [

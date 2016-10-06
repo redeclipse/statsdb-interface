@@ -118,6 +118,15 @@ class GameWeapon(db.Model):
         return '<GameWeapon %s from %d (%d)>' % (self.weapon,
                                                  self.game_id, self.player)
 
+    def is_not_wielded(self):
+        re = redeclipse.versions.default
+        return self.weapon in re.notwielded
+
+    def time(self):
+        if self.is_not_wielded():
+            return self.timeloadout
+        return self.timewielded
+
     def to_dict(self):
         return direct_to_dict(self, [
             "game_id", "player", "playerhandle", "weapon",

@@ -16,15 +16,24 @@ def first_game_in_days(days):
             .filter(models.Game.time >= days_ago(days)))
 
 
-def weapon_sums(days):
+def weapon_sums(days, use_totalwielded=True):
     first_game = first_game_in_days(days)
-    totalwielded = (models.GameWeapon.query
-                    .with_entities(db.func.sum(
-                        models.GameWeapon.timewielded))
-                    .filter(models.GameWeapon.game_id >= first_game)
-                    .first()[0])
-    weapons = extmodels.Weapon.all_from_f(
-        models.GameWeapon.game_id >= first_game)
+    totalwielded = 0
+    if use_totalwielded:
+        totalwielded = (models.GameWeapon.query
+                        .with_entities(db.func.sum(
+                            models.GameWeapon.timewielded))
+                        .filter(models.GameWeapon.game_id >= first_game)
+                        .filter(db.func.re_normal_weapons(
+                            models.GameWeapon.game_id))
+                        .filter(models.GameWeapon.weapon.in_(
+                            redeclipse.versions.default.standardweaponlist))
+                        .first()[0])
+    weapons = extmodels.Weapon.all_from_f((
+        models.GameWeapon.game_id >= first_game,
+        db.func.re_normal_weapons(models.GameWeapon.game_id),
+        models.GameWeapon.weapon.in_(
+            redeclipse.versions.default.standardweaponlist)))
     return {
          "weapons": weapons,
          "totalwielded": totalwielded or 0,
@@ -41,6 +50,19 @@ def weapons_by_wielded(days):
     ret = sorted(res["weapons"], key=lambda w: w.timewielded, reverse=True)
     return [{"name": w.name, "timewielded":
              w.timewielded / max(1, res["totalwielded"])} for w in ret]
+
+
+@cached(15 * 60)
+def weapons_by_dpm(days):
+    """
+    Return weapons sorted by DPM.
+    Cache can be high, result will not change quickly.
+    """
+    res = weapon_sums(days, False)
+    ret = sorted(res["weapons"], key=lambda w: (w.damage1 + w.damage2) /
+                 (max(1, w.time()) / 60), reverse=True)
+    return [{"name": w.name, "dpm": (w.damage1 + w.damage2) /
+             (max(1, w.time()) / 60)} for w in ret]
 
 
 @cached(60)
@@ -93,6 +115,27 @@ def servers_by_games(days):
     return sorted(ret, key=lambda p: p['games'], reverse=True)
 
 
+@cached(60)
+def players_by_kdr(days):
+    first_game = first_game_in_days(days)
+    ret = {}
+    for player in (models.GamePlayer.query
+                   .filter(models.GamePlayer.game_id >= first_game)
+                   .filter(models.GamePlayer.handle != "")):
+        if player.handle not in ret:
+            ret[player.handle] = {
+                "handle": player.handle,
+                "frags": 0,
+                "deaths": 0,
+                }
+        ret[player.handle]["frags"] += player.frags
+        ret[player.handle]["deaths"] += player.deaths
+    for h in ret:
+        ret[h]['kdr'] = ret[h]['frags'] / max(1, ret[h]['deaths'])
+    return [ret[h] for h in sorted(ret, key=lambda p: ret[p]['kdr'],
+                                   reverse=True)]
+
+
 @cached(5 * 60)
 def players_by_dpm(days):
     """
@@ -104,6 +147,7 @@ def players_by_dpm(days):
                .with_entities(models.GamePlayer.handle)
                .filter(models.GamePlayer.game_id >= first_game)
                .filter(models.GamePlayer.handle != "")
+               .filter(db.func.re_normal_weapons(models.GamePlayer.game_id))
                .group_by(models.GamePlayer.handle))
     for player in players:
         player = player[0]
@@ -122,11 +166,10 @@ def players_by_dpm(days):
             "handle": player,
             "dpm": (((d1 or 0) + (d2 or 0)) / (max(timewielded or 0, 1) / 60)),
             }
-    return [{
-        "handle": res_compiled[p]['handle'],
-        "dpm": res_compiled[p]['dpm'],
-        } for p in sorted(
-            res_compiled, key=lambda p: res_compiled[p]['dpm'], reverse=True)]
+    return [res_compiled[p] for p in sorted(res_compiled,
+                                            key=lambda p:
+                                                res_compiled[p]['dpm'],
+                                            reverse=True)]
 
 
 @cached(10 * 60)
@@ -153,19 +196,13 @@ def player_weapons(days):
                 "time": 0,
                 }
         res_compiled[r.playerhandle]['frags'] += (r.frags1 + r.frags2)
-        res_compiled[r.playerhandle]['time'] += (
-            r.timeloadout
-            if r.weapon in redeclipse.versions.default.notwielded
-            else r.timewielded)
+        res_compiled[r.playerhandle]['time'] += r.time()
     for weapon in weapons:
         for h in weapons[weapon]:
             weapons[weapon][h]['fpm'] = (weapons[weapon][h]['frags'] /
                                          (max(weapons[weapon][h]['time'], 1) /
                                           60))
-        weapons[weapon] = [{
-            "handle": weapons[weapon][p]['handle'],
-            "fpm": weapons[weapon][p]['fpm'],
-            } for p in sorted(
+        weapons[weapon] = [weapons[weapon][p] for p in sorted(
                 weapons[weapon], key=lambda p: weapons[weapon][p]['fpm'],
                 reverse=True)]
     weapons_compiled = []
