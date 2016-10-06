@@ -13,7 +13,7 @@ def days_ago(days):
 def first_game_in_days(days):
     return (models.Game.query
             .with_entities(db.func.min(models.Game.id))
-            .filter(models.Game.time >= days_ago(days)))
+            .filter(models.Game.time >= days_ago(days))).scalar()
 
 
 def weapon_sums(days, use_totalwielded=True):
@@ -97,6 +97,26 @@ def players_by_games(days):
             "games": players.count(player),
             })
     return sorted(ret, key=lambda p: p['games'], reverse=True)
+
+
+@cached(60)
+def modes_by_games(days):
+    re = redeclipse.versions.default
+    first_game = first_game_in_days(days)
+    modes = extmodels.Mode.mode_list()
+    ret = []
+    for mode in modes:
+        m = {
+            'name': mode,
+            'longname': re.modestr[re.modes[mode]],
+            'games': 0,
+            }
+        m['games'] = models.Game.query.filter(
+            db.func.re_mode(models.Game.id, mode),
+            models.Game.id >= first_game
+            ).count()
+        ret.append(m)
+    return sorted(ret, key=lambda m: m['games'], reverse=True)
 
 
 @cached(60)

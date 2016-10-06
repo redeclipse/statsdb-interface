@@ -9,7 +9,7 @@
 {%- endmacro %}
 
 {% macro fancy_mode(mode, size=24) -%}
-    <a href="{{ url_for('.display_mode', name=mode.name) }}"><img src="{{ url_for('static', filename='images/modes/%s.png' % mode.mode_str(True)) }}" alt="{{ mode.mode_str() }}" title="{{ mode.mode_str() }}" width="{{ size }}" height="{{ size }}"></a>
+    <a href="{{ url_for('.display_mode', name=mode.name) }}"><img src="{{ url_for('static', filename='images/modes/%s.png' % mode.name) }}" alt="{{ mode.longname }}" title="{{ mode.longname }}" width="{{ size }}" height="{{ size }}"></a>
 {%- endmacro %}
 
 {% macro fancy_mutators(game, maxlong=3) -%}

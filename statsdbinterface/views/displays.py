@@ -160,7 +160,8 @@ def display_modes():
     ret = render_template('displays/modes.html',
                           modes=sorted(extmodels.Mode.all(),
                                        key=lambda m: len(m.game_ids),
-                                       reverse=True))
+                                       reverse=True),
+                          rankings=rankings)
     return ret
 
 
