@@ -192,18 +192,18 @@ def player_weapons(days):
         if r.playerhandle not in res_compiled:
             res_compiled[r.playerhandle] = {
                 "handle": r.playerhandle,
-                "frags": 0,
+                "damage": 0,
                 "time": 0,
                 }
-        res_compiled[r.playerhandle]['frags'] += (r.frags1 + r.frags2)
+        res_compiled[r.playerhandle]['damage'] += (r.damage1 + r.damage2)
         res_compiled[r.playerhandle]['time'] += r.time()
     for weapon in weapons:
         for h in weapons[weapon]:
-            weapons[weapon][h]['fpm'] = (weapons[weapon][h]['frags'] /
+            weapons[weapon][h]['dpm'] = (weapons[weapon][h]['damage'] /
                                          (max(weapons[weapon][h]['time'], 1) /
                                           60))
         weapons[weapon] = [weapons[weapon][p] for p in sorted(
-                weapons[weapon], key=lambda p: weapons[weapon][p]['fpm'],
+                weapons[weapon], key=lambda p: weapons[weapon][p]['dpm'],
                 reverse=True)]
     weapons_compiled = []
     for weapon in weapons:
@@ -211,12 +211,12 @@ def player_weapons(days):
             weapons_compiled.append({
                 "weapon": weapon,
                 "handle": player['handle'],
-                "fpm": player['fpm'],
+                "dpm": player['dpm'],
                 })
     ret = []
     seen = []
     for entry in sorted(weapons_compiled,
-                        key=lambda w: w['fpm'],
+                        key=lambda w: w['dpm'],
                         reverse=True):
         if entry['weapon'] in seen:
             continue
