@@ -11,9 +11,13 @@ def days_ago(days):
 
 @cached(60)
 def first_game_in_days(days):
-    return (models.Game.query
-            .with_entities(db.func.min(models.Game.id))
-            .filter(models.Game.time >= days_ago(days))).scalar()
+    return (
+        (models.Game.query
+         .with_entities(db.func.min(models.Game.id))
+         .filter(models.Game.time >= days_ago(days))).scalar() or
+        (models.Game.query
+         .with_entities(db.func.max(models.Game.id)).scalar() + 1)
+        )
 
 
 def weapon_sums(days, use_totalwielded=True):
