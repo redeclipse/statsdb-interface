@@ -1,5 +1,4 @@
 from ..database.core import db_function, db
-from ..database.models import Game, GameServer
 from . import versions
 
 
@@ -23,6 +22,7 @@ re_normal_weapons.cache = {}
 
 @db_function('re_mode')
 def re_mode(game_id, mode):
+    from ..database.models import Game
     if mode in re_mode.precache and game_id <= re_mode.lastprecache:
         return game_id in re_mode.precache[mode]
 
@@ -44,6 +44,7 @@ re_mode.lastprecache = 0
 
 @db_function('re_mut')
 def re_mut(game_id, mut):
+    from ..database.models import Game
     if mut in re_mut.precache and game_id <= re_mut.lastprecache:
         return game_id in re_mut.precache[mut]
 
@@ -80,6 +81,7 @@ def build_precache():
     """
     Build a precache of games before the current run.
     """
+    from ..database.models import Game, GameServer
     re_mut.lastprecache = re_mode.lastprecache = Game.query.with_entities(
         db.func.max(Game.id)).first()[0]
     for vclass in versions.registry:
