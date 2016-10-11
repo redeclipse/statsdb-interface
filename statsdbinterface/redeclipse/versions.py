@@ -1,4 +1,3 @@
-from ..database.models import Game, GameServer
 from ..database.core import db
 from collections import OrderedDict
 
@@ -35,6 +34,7 @@ def get_version_class(version):
 
 
 def get_game_version(game_id):
+    from ..database.models import Game
     if game_id not in game_cache:
         game_cache[game_id] = Game.query.filter(
             Game.id == game_id).first().server[0].version
@@ -42,6 +42,7 @@ def get_game_version(game_id):
 
 
 def build_precache():
+    from ..database.models import Game, GameServer
     for vclass in registry:
         for r in (Game.query.with_entities(Game.id)
                   .join(Game.server)
