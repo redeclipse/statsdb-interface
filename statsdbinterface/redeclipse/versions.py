@@ -83,6 +83,11 @@ class RE:
         self.shortmutators = {}
         for mutator in self.mutators:
             for t in range(2, 10):
+                # If the mutator is one character longer than the short
+                # version, just use the mutator.
+                if len(mutator) - t <= 1:
+                    self.shortmutators[mutator] = mutator
+                    break
                 shortened = mutator[:t]
                 others = [m[:t] for m in self.mutators if m != mutator]
                 if shortened not in others:
