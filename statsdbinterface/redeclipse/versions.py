@@ -19,7 +19,7 @@ def get_version_class(version):
 
     vtuple = version_str_to_tuple(version)
     for vclass in registry:
-        if vtuple >= vclass.start and vtuple <= vclass.end:
+        if vclass.start <= vtuple <= vclass.end:
             version_cache[version] = vclass
             return version_cache[version]
 
@@ -107,12 +107,12 @@ class RE:
                 yield l[i:i + n]
 
         for m in self.basemuts:
-            if (mutators & self.basemuts[m]):
+            if mutators & self.basemuts[m]:
                 muts.append(m)
 
         if mode in self.gspmuts:
             for m in self.gspmuts[mode]:
-                if (mutators & self.gspmuts[mode][m]):
+                if mutators & self.gspmuts[mode][m]:
                     muts.append(m)
 
         if short:

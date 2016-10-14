@@ -149,7 +149,7 @@ class Game(db.Model):
     usetotals = db.Column(db.Integer)
 
     def __repr__(self):
-        return '<Game %d>' % (self.id)
+        return '<Game %d>' % self.id
 
     def combined_ffarounds(self):
         # Combine the various game_ffarounds entries into a single list.
@@ -199,7 +199,7 @@ class Game(db.Model):
         re = self.re()
 
         for m in re.basemuts:
-            if (self.mutators & re.basemuts[m]):
+            if self.mutators & re.basemuts[m]:
                 ret.append({
                     "link": m,
                     "name": m,
@@ -209,7 +209,7 @@ class Game(db.Model):
 
         if self.mode in re.gspmuts:
             for m in re.gspmuts[self.mode]:
-                if (self.mutators & re.gspmuts[self.mode][m]):
+                if self.mutators & re.gspmuts[self.mode][m]:
                     mn = re.cmodestr[self.mode] + '-' + m
                     ret.append({
                         "link": mn,

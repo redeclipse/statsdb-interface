@@ -422,7 +422,7 @@ class Mode:
         ]
 
     def mode_str(self, short=False):
-        return (self.name if short else self.longname)
+        return self.name if short else self.longname
 
     def games(self, page=0, pagesize=None):
         # Return full Game objects from Mode's game_ids.
