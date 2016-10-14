@@ -19,7 +19,7 @@ def get_version_class(version):
 
     vtuple = version_str_to_tuple(version)
     for vclass in registry:
-        if vtuple >= vclass.start and vtuple <= vclass.end:
+        if vclass.start <= vtuple <= vclass.end:
             version_cache[version] = vclass
             return version_cache[version]
 

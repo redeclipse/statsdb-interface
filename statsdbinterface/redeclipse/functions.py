@@ -74,7 +74,7 @@ def re_ver(version, vmin, vmax):
     vmax = versions.version_str_to_tuple(vmax)
     v = versions.version_str_to_tuple(version)
 
-    return v >= vmin and v <= vmax
+    return vmin <= v <= vmax
 
 
 def build_precache():
