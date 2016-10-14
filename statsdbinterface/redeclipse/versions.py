@@ -107,12 +107,12 @@ class RE:
                 yield l[i:i + n]
 
         for m in self.basemuts:
-            if (mutators & self.basemuts[m]):
+            if mutators & self.basemuts[m]:
                 muts.append(m)
 
         if mode in self.gspmuts:
             for m in self.gspmuts[mode]:
-                if (mutators & self.gspmuts[mode][m]):
+                if mutators & self.gspmuts[mode][m]:
                     muts.append(m)
 
         if short:

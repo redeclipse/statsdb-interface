@@ -60,7 +60,7 @@ def re_mut(game_id, mut):
 
     re_mut.cache[game_id] = (game.mode, game.mutators)
 
-    return (mut in vclass.mutslist(game.mode, game.mutators))
+    return mut in vclass.mutslist(game.mode, game.mutators)
 
 
 re_mut.cache = {}
