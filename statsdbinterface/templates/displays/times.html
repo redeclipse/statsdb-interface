@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% set current_display = "players" %}
+
+{% block title %}Active Times{% endblock title %}
+
+{% block content %}
+    <h2>From the last {{ days }} days</h2>
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th>{{ tablelabel }} (UTC)</th>
+                <th>Players</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for time in times %}
+                <tr>
+                    <td>{{ time.label }}</td>
+                    <td>{{ time.bar }}</td>
+                <tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock content %}

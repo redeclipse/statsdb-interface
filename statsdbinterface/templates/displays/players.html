@@ -4,6 +4,9 @@
 {% block title %}Players{% endblock title %}
 
 {% block content %}
+    <a href="{{ url_for('.display_activeweekdayhours') }}" class="btn btn-default pull-right">Active Weekdays + Hours</a>
+    <a href="{{ url_for('.display_activeweekdays') }}" class="btn btn-default pull-right">Active Weekdays</a>
+    <a href="{{ url_for('.display_activehours') }}" class="btn btn-default pull-right">Active Hours</a>
     <table class="table table-hover">
         <thead>
             <tr>

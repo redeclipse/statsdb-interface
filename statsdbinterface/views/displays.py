@@ -244,4 +244,88 @@ def display_weapons():
                           )
     return ret
 
+
+@bp.route("/activehours")
+def display_activehours():
+    first_game = rankings.first_game_in_days(30)
+    times = {}
+    for game in (models.Game.query
+                 .filter(models.Game.id >= first_game)):
+        hour = int(templateutils.time_str(game.time, "%H"))
+        if hour not in times:
+            times[hour] = {
+                "players": 0
+            }
+        times[hour]["players"] += 1
+    barfactor = 100 / max([times[t]["players"] for t in times])
+    for hour in times:
+        times[hour]["hour"] = hour
+        times[hour]["label"] = hour
+        times[hour]["players"] = round(times[hour]["players"], 1)
+        times[hour]["bar"] = "|" * round(times[hour]["players"] * barfactor)
+    ret = render_template('displays/times.html',
+                          days=30,
+                          tabellabel="Hour",
+                          times=sorted(times.values(),
+                                       key=lambda k: k["hour"]))
+    return ret
+
+
+@bp.route("/activeweekdays")
+def display_activeweekdays():
+    first_game = rankings.first_game_in_days(30)
+    times = {}
+    for game in (models.Game.query
+                 .filter(models.Game.id >= first_game)):
+        dayidx = int(templateutils.time_str(game.time, "%u"))
+        day = templateutils.time_str(game.time, "%a")
+        if dayidx not in times:
+            times[dayidx] = {
+                "players": 0,
+                "label": day,
+            }
+        times[dayidx]["players"] += 1
+    barfactor = 100 / max([times[t]["players"] for t in times])
+    for day in times:
+        times[day]["day"] = day
+        times[day]["players"] = round(times[day]["players"], 1)
+        times[day]["bar"] = "|" * round(times[day]["players"] * barfactor)
+    ret = render_template('displays/times.html',
+                          days=30,
+                          tabellabel="Weekday",
+                          times=sorted(times.values(), key=lambda k: k["day"]))
+    return ret
+
+
+@bp.route("/activeweekdayhours")
+def display_activeweekdayhours():
+    first_game = rankings.first_game_in_days(30)
+    times = {}
+    for game in (models.Game.query
+                 .filter(models.Game.id >= first_game)):
+        dayidx = int(templateutils.time_str(game.time, "%u"))
+        day = templateutils.time_str(game.time, "%a")
+        hour = int(templateutils.time_str(game.time, "%H"))
+        idx = (dayidx, hour)
+        if idx not in times:
+            times[idx] = {
+                "players": 0,
+                "label": "%s %d" % (day, hour),
+                "day": dayidx,
+                "hour": hour,
+            }
+        times[idx]["players"] += 1
+    barfactor = 100 / max([times[t]["players"] for t in times])
+    for idx in times:
+        times[idx]["players"] = round(times[idx]["players"], 1)
+        times[idx]["bar"] = "|" * round(times[idx]["players"] * barfactor)
+    ret = render_template('displays/times.html',
+                          days=30,
+                          tabellabel="Time",
+                          times=sorted(sorted(times.values(),
+                                              key=lambda k: k["hour"]),
+                                       key=lambda k: k["day"]))
+    return ret
+
+
 templateutils.setup(bp)
