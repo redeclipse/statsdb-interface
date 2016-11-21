@@ -63,7 +63,9 @@ def weapons_by_dpm(days):
     Cache can be high, result will not change quickly.
     """
     res = weapon_sums(days, False)
-    ret = sorted(res["weapons"], key=lambda w: (w.damage1 + w.damage2) /
+    mintime = sum([w.time() for w in res["weapons"]]) / len(res["weapons"]) / 4
+    ret = sorted([w for w in res["weapons"] if w.time() >= mintime],
+                 key=lambda w: (w.damage1 + w.damage2) /
                  (max(1, w.time()) / 60), reverse=True)
     return [{"name": w.name, "dpm": (w.damage1 + w.damage2) /
              (max(1, w.time()) / 60)} for w in ret]
@@ -171,20 +173,28 @@ def servers_by_games(days):
 def players_by_kdr(days):
     first_game = first_game_in_days(days)
     ret = {}
-    for player in (models.GamePlayer.query
+    games = {}
+    for player in (models.GamePlayer.query.join(models.Game)
                    .filter(models.GamePlayer.game_id >= first_game)
-                   .filter(models.GamePlayer.handle != "")):
+                   .filter(models.GamePlayer.handle != "")
+                   .filter(models.Game.uniqueplayers > 1)):
         if player.handle not in ret:
             ret[player.handle] = {
                 "handle": player.handle,
                 "frags": 0,
                 "deaths": 0,
                 }
+            games[player.handle] = 0
+        games[player.handle] += 1
         ret[player.handle]["frags"] += player.frags
         ret[player.handle]["deaths"] += player.deaths
+    # Only count players who have played >= half the average number of games.
+    # This avoids small numbers of games from skewing the values.
+    gamemin = min([sum(games.values()) / len(games) / 2, max(games.values())])
     for h in ret:
         ret[h]['kdr'] = ret[h]['frags'] / max(1, ret[h]['deaths'])
-    return [ret[h] for h in sorted(ret, key=lambda p: ret[p]['kdr'],
+    return [ret[h] for h in sorted([p for p in ret if games[p] >= gamemin],
+                                   key=lambda p: ret[p]['kdr'],
                                    reverse=True)]
 
 
@@ -195,14 +205,18 @@ def players_by_dpm(days):
     """
     first_game = first_game_in_days(days)
     res_compiled = {}
-    players = (models.GamePlayer.query
-               .with_entities(models.GamePlayer.handle)
-               .filter(models.GamePlayer.game_id >= first_game)
-               .filter(models.GamePlayer.handle != "")
-               .filter(db.func.re_normal_weapons(models.GamePlayer.game_id))
-               .group_by(models.GamePlayer.handle))
-    for player in players:
-        player = player[0]
+    games = {}
+    for player in (models.GamePlayer.query.join(models.Game)
+                   .with_entities(models.GamePlayer.handle)
+                   .filter(models.GamePlayer.game_id >= first_game)
+                   .filter(models.GamePlayer.handle != "")
+                   .filter(db.func.re_normal_weapons(
+                       models.GamePlayer.game_id))
+                   .filter(models.Game.uniqueplayers > 1)):
+        if player.handle not in games:
+            games[player.handle] = 0
+        games[player.handle] += 1
+    for player in games.keys():
         d1, d2, timewielded = (
             models.GameWeapon.query
             .with_entities(db.func.sum(models.GameWeapon.damage1),
@@ -218,7 +232,11 @@ def players_by_dpm(days):
             "handle": player,
             "dpm": (((d1 or 0) + (d2 or 0)) / (max(timewielded or 0, 1) / 60)),
             }
-    return [res_compiled[p] for p in sorted(res_compiled,
+    # Only count players who have played >= half the average number of games.
+    # This avoids small numbers of games from skewing the values.
+    gamemin = min([sum(games.values()) / len(games) / 2, max(games.values())])
+    return [res_compiled[p] for p in sorted([p for p in res_compiled
+                                             if games[p] >= gamemin],
                                             key=lambda p:
                                                 res_compiled[p]['dpm'],
                                             reverse=True)]
@@ -237,6 +255,8 @@ def player_weapons(days):
            .filter(models.GameWeapon.weapon.in_(
                redeclipse.versions.default.standardweaponlist))).all()
     weapons = {}
+    totaltime = 0
+    lentime = 0
     for weapon in redeclipse.versions.default.standardweaponlist:
         weapons[weapon] = {}
     for r in res:
@@ -249,6 +269,8 @@ def player_weapons(days):
                 }
         res_compiled[r.playerhandle]['damage'] += (r.damage1 + r.damage2)
         res_compiled[r.playerhandle]['time'] += r.time()
+        totaltime += res_compiled[r.playerhandle]['time']
+        lentime += 1
     for weapon in weapons:
         for h in weapons[weapon]:
             weapons[weapon][h]['dpm'] = (weapons[weapon][h]['damage'] /
@@ -257,14 +279,17 @@ def player_weapons(days):
         weapons[weapon] = [weapons[weapon][p] for p in sorted(
                 weapons[weapon], key=lambda p: weapons[weapon][p]['dpm'],
                 reverse=True)]
+    # Only select weapons that have been used for some time, no quick switches.
+    mintime = totaltime / lentime / 2
     weapons_compiled = []
     for weapon in weapons:
         for player in weapons[weapon]:
-            weapons_compiled.append({
-                "weapon": weapon,
-                "handle": player['handle'],
-                "dpm": player['dpm'],
-                })
+            if player['time'] >= mintime:
+                weapons_compiled.append({
+                    "weapon": weapon,
+                    "handle": player['handle'],
+                    "dpm": player['dpm'],
+                    })
     ret = []
     seen = []
     for entry in sorted(weapons_compiled,
