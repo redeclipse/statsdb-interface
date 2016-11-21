@@ -265,7 +265,7 @@ def display_activehours():
         times[hour]["bar"] = "|" * round(times[hour]["players"] * barfactor)
     ret = render_template('displays/times.html',
                           days=30,
-                          tabellabel="Hour",
+                          label="Hours",
                           times=sorted(times.values(),
                                        key=lambda k: k["hour"]))
     return ret
@@ -292,7 +292,7 @@ def display_activeweekdays():
         times[day]["bar"] = "|" * round(times[day]["players"] * barfactor)
     ret = render_template('displays/times.html',
                           days=30,
-                          tabellabel="Weekday",
+                          label="Weekdays",
                           times=sorted(times.values(), key=lambda k: k["day"]))
     return ret
 
@@ -321,7 +321,7 @@ def display_activeweekdayhours():
         times[idx]["bar"] = "|" * round(times[idx]["players"] * barfactor)
     ret = render_template('displays/times.html',
                           days=30,
-                          tabellabel="Time",
+                          label="Weekday Hours",
                           times=sorted(sorted(times.values(),
                                               key=lambda k: k["hour"]),
                                        key=lambda k: k["day"]))
