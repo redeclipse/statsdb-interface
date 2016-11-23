@@ -273,7 +273,7 @@ def display_activehours():
 
 @bp.route("/activeweekdays")
 def display_activeweekdays():
-    first_game = rankings.first_game_in_days(30)
+    first_game = rankings.first_game_in_days(90)
     times = {}
     for game in (models.Game.query
                  .filter(models.Game.id >= first_game)):
@@ -291,7 +291,7 @@ def display_activeweekdays():
         times[day]["players"] = round(times[day]["players"], 1)
         times[day]["bar"] = "|" * round(times[day]["players"] * barfactor)
     ret = render_template('displays/times.html',
-                          days=30,
+                          days=90,
                           label="Weekdays",
                           times=sorted(times.values(), key=lambda k: k["day"]))
     return ret
@@ -299,7 +299,7 @@ def display_activeweekdays():
 
 @bp.route("/activeweekdayhours")
 def display_activeweekdayhours():
-    first_game = rankings.first_game_in_days(30)
+    first_game = rankings.first_game_in_days(90)
     times = {}
     for game in (models.Game.query
                  .filter(models.Game.id >= first_game)):
@@ -320,7 +320,7 @@ def display_activeweekdayhours():
         times[idx]["players"] = round(times[idx]["players"], 1)
         times[idx]["bar"] = "|" * round(times[idx]["players"] * barfactor)
     ret = render_template('displays/times.html',
-                          days=30,
+                          days=90,
                           label="Weekday Hours",
                           times=sorted(sorted(times.values(),
                                               key=lambda k: k["hour"]),
