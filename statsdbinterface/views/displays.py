@@ -251,13 +251,13 @@ def display_weapons():
 def display_activehours():
     minutes = int(templateutils.time_str(time.time(), "%M"))
     days = (1 / 24 / 60) * (24 * 60 * 30 + minutes)
-    thishour = int(templateutils.time_str(time.time(), "%H"))
+    thishour = templateutils.time_str(time.time(), "%F %H")
     first_game = rankings.first_game_in_days(days)
     times = {}
     for game in (models.Game.query
                  .filter(models.Game.id >= first_game)):
         hour = int(templateutils.time_str(game.time, "%H"))
-        if hour == thishour:
+        if templateutils.time_str(game.time, "%F %H") == thishour:
             continue
         if hour not in times:
             times[hour] = {
