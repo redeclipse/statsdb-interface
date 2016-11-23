@@ -1,3 +1,5 @@
+import time
+
 from flask import current_app
 from flask import Blueprint, render_template, send_from_directory, request
 
@@ -247,12 +249,16 @@ def display_weapons():
 
 @bp.route("/activehours")
 def display_activehours():
-    days = 30
+    minutes = int(templateutils.time_str(time.time(), "%M"))
+    days = (1 / 24 / 60) * (24 * 60 * 30 + minutes)
+    thishour = int(templateutils.time_str(time.time(), "%H"))
     first_game = rankings.first_game_in_days(days)
     times = {}
     for game in (models.Game.query
                  .filter(models.Game.id >= first_game)):
         hour = int(templateutils.time_str(game.time, "%H"))
+        if hour == thishour:
+            continue
         if hour not in times:
             times[hour] = {
                 "players": 0
@@ -265,7 +271,7 @@ def display_activehours():
         times[hour]["players"] = round(times[hour]["players"], 1)
         times[hour]["bar"] = "|" * round(times[hour]["players"] * barfactor)
     ret = render_template('displays/times.html',
-                          days=days,
+                          days=30,
                           label="Hours",
                           times=sorted(times.values(),
                                        key=lambda k: k["hour"]))
@@ -274,11 +280,17 @@ def display_activehours():
 
 @bp.route("/activeweekdays")
 def display_activeweekdays():
-    days = 7 * 4 + 1
+    gmtime = time.gmtime()
+    secondsleftinday = 24 * 60 * 60 - (
+        gmtime.tm_sec + gmtime.tm_min * 60 + gmtime.tm_hour * 3600)
+    days = 7 * 4 + (secondsleftinday / 24 / 60 / 60)
     first_game = rankings.first_game_in_days(days)
+    today = templateutils.time_str(time.time(), "%F")
     times = {}
     for game in (models.Game.query
                  .filter(models.Game.id >= first_game)):
+        if templateutils.time_str(game.time, "%F") == today:
+            continue
         dayidx = int(templateutils.time_str(game.time, "%u"))
         day = templateutils.time_str(game.time, "%a")
         if dayidx not in times:
@@ -293,7 +305,7 @@ def display_activeweekdays():
         times[day]["players"] = round(times[day]["players"], 1)
         times[day]["bar"] = "|" * round(times[day]["players"] * barfactor)
     ret = render_template('displays/times.html',
-                          days=days,
+                          days=28,
                           label="Weekdays",
                           times=sorted(times.values(), key=lambda k: k["day"]))
     return ret
@@ -301,11 +313,17 @@ def display_activeweekdays():
 
 @bp.route("/activeweekdayhours")
 def display_activeweekdayhours():
-    days = 7 * 4 + 1
+    gmtime = time.gmtime()
+    secondsleftinday = 24 * 60 * 60 - (
+        gmtime.tm_sec + gmtime.tm_min * 60 + gmtime.tm_hour * 3600)
+    days = 7 * 4 + (secondsleftinday / 24 / 60 / 60)
     first_game = rankings.first_game_in_days(days)
+    today = templateutils.time_str(time.time(), "%F")
     times = {}
     for game in (models.Game.query
                  .filter(models.Game.id >= first_game)):
+        if templateutils.time_str(game.time, "%F") == today:
+            continue
         dayidx = int(templateutils.time_str(game.time, "%u"))
         day = templateutils.time_str(game.time, "%a")
         hour = int(templateutils.time_str(game.time, "%H"))
@@ -323,7 +341,7 @@ def display_activeweekdayhours():
         times[idx]["players"] = round(times[idx]["players"], 1)
         times[idx]["bar"] = "|" * round(times[idx]["players"] * barfactor)
     ret = render_template('displays/times.html',
-                          days=days,
+                          days=28,
                           label="Weekday Hours",
                           times=sorted(sorted(times.values(),
                                               key=lambda k: k["hour"]),
