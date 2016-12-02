@@ -33,7 +33,13 @@ def display_games():
             current_app.config['DISPLAY_RESULTS_PER_PAGE'])
 
     return render_template('displays/games.html', pager=pager,
-                           Game=models.Game)
+                           Game=models.Game,
+                           gametime=models.Game.query.with_entities(
+                                   db.func.sum(models.Game.timeplayed)
+                               ).first()[0],
+                           playertime=models.GamePlayer.query.with_entities(
+                                   db.func.sum(models.GamePlayer.timeactive)
+                               ).first()[0])
 
 
 @bp.route("/game/<int:gameid>")

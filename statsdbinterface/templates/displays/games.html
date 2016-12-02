@@ -1,10 +1,11 @@
 {% extends 'base.html' %}
+{% import 'utils/time.html' as timeutils %}
 {% set current_display = "games" %}
 
 {% block title %}Games{% endblock title %}
 
 {% block content %}
-    <p>{{ Game.query.count() }} games total.</p>
+    <p>{{ Game.query.count() }} games total, time in games: {{ timeutils.span(gametime, maxunit="hour") }}, combined player time: {{ timeutils.span(playertime, maxunit="hour") }}</p>
     {% set games = pager.items %}
     {% include 'tables/games.html' %}
 {% endblock content %}
