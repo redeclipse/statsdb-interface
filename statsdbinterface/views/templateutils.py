@@ -40,6 +40,8 @@ def duration_str(difference, short=False, exact=False, decimal=False,
     remaining = difference
 
     for seconds, long_name, short_name, maximum in levels:
+        if long_name == maxunit:
+            maximum = 0
         use_decimal = (decimal and seconds == 1)
         if use_decimal:
             of_this = remaining / seconds
