@@ -7,6 +7,7 @@
 {% block content %}
     <h3>{{ map.name }}</h3>
     <p>First seen {{ timeutils.ago(map.first.time, False) }} with <a href="{{ url_for('.display_game', gameid=map.first.id) }}">game {{ map.first.id }}</a>, Last seen {{ timeutils.ago(map.latest.time, False) }} with <a href="{{ url_for('.display_game', gameid=map.latest.id) }}">game {{ map.latest.id }}</a>, {{ map.game_ids|count }} games total.</p>
+    <p>Time on server: {{ timeutils.span(map.gametime, exact=True, maxunit="hour") }}, Combined player time: {{ timeutils.span(map.playertime, exact=True, maxunit="hour") }}</p>
     <div class="row">
         {% if map.topraces() %}
             <div class="col-md-6">

@@ -314,6 +314,14 @@ class Map:
             Game.id == self.game_ids[-1]).first()
         self.first = Game.query.filter(
             Game.id == self.game_ids[0]).first()
+        self.gametime = Game.query.with_entities(
+            db.func.sum(Game.timeplayed)).filter(
+                Game.map == self.name
+            ).first()[0]
+        self.playertime = GamePlayer.query.with_entities(
+            db.func.sum(GamePlayer.timeactive)).filter(
+                GamePlayer.game_id.in_(self.game_ids)
+            ).first()[0]
 
     def games(self, page=0, pagesize=None):
         # Return full Game objects from Map's game_ids.

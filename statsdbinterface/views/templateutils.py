@@ -8,12 +8,17 @@ def time_str(epoch_time, output_format="%F %T %Z"):
     return time.strftime(output_format, time.gmtime(epoch_time))
 
 
-def duration_str(difference, short=False, exact=False, decimal=False):
+def duration_str(difference, short=False, exact=False, decimal=False,
+                 maxunit=False):
     """
     Return difference as a human-readable string.
     """
-    # <sconds>, <long name>, <short name>, <maximum before rounding>
-    levels = [
+
+    if not maxunit:
+        maxunit = "year"
+
+    # <seconds>, <long name>, <short name>, <maximum before rounding>
+    _levels = [
         (60 * 60 * 24 * 365.25, "year", "y", 0),
         (60 * 60 * 24 * 7, "week", "w", 52 * 2),
         (60 * 60 * 24, "day", "d", 7 * 2),
@@ -21,6 +26,15 @@ def duration_str(difference, short=False, exact=False, decimal=False):
         (60, "minute", "m", 60 * 2),
         (1, "second", "s", 60),
     ]
+
+    levels = []
+    seenmax = False
+
+    for l in _levels:
+        if l[1] == maxunit:
+            seenmax = True
+        if seenmax:
+            levels.append(l)
 
     ret = ""
     remaining = difference

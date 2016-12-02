@@ -234,7 +234,8 @@ def players_by_dpm(days):
             }
     # Only count players who have played >= half the average number of games.
     # This avoids small numbers of games from skewing the values.
-    gamemin = min([sum(games.values()) / len(games) / 2, max(games.values())])
+    gamemin = min([sum(games.values()) / max(len(games), 1) / 2,
+                   games and max(games.values()) or 0])
     return [res_compiled[p] for p in sorted([p for p in res_compiled
                                              if games[p] >= gamemin],
                                             key=lambda p:
@@ -280,7 +281,7 @@ def player_weapons(days):
                 weapons[weapon], key=lambda p: weapons[weapon][p]['dpm'],
                 reverse=True)]
     # Only select weapons that have been used for some time, no quick switches.
-    mintime = totaltime / lentime / 2
+    mintime = max(totaltime, 1) / max(lentime, 1) / 2
     weapons_compiled = []
     for weapon in weapons:
         for player in weapons[weapon]:
