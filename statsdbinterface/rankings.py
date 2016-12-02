@@ -71,12 +71,13 @@ def weapons_by_dpm(days):
              (max(1, w.time()) / 60)} for w in ret]
 
 
-@cached(60)
-def maps_by_games(days):
+@cached(60 * 3)
+def maps_by_playertime(days):
     """
-    Return maps sorted by their number of games.
+    Return maps sorted by their player time.
     Cache should be low, result could change quickly.
     """
+    first_game = first_game_in_days(days)
     maps = [r[0] for r in models.Game.query
             .with_entities(models.Game.map)
             .filter(models.Game.time >= days_ago(days))]
@@ -84,9 +85,15 @@ def maps_by_games(days):
     for map_ in set(maps):
         ret.append({
             "name": map_,
+            "time": (models.GamePlayer.query
+                     .join(models.Game)
+                     .with_entities(db.func.sum(models.GamePlayer.timeactive))
+                     .filter(models.GamePlayer.game_id >= first_game)
+                     .filter(models.Game.map == map_)
+                     .first()[0]),
             "games": maps.count(map_),
             })
-    return sorted(ret, key=lambda m: m['games'], reverse=True)
+    return sorted(ret, key=lambda m: m['time'], reverse=True)
 
 
 @cached(60)

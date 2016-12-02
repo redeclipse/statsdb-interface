@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% import 'utils/time.html' as timeutils %}
 {% import 'utils/redeclipse.html' as redeclipse %}
 {% set current_display = "dashboard" %}
 
@@ -94,13 +95,15 @@
                 <thead>
                     <tr>
                         <th>Map</th>
+                        <th>Played</th>
                         <th>Games</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {% for map in rankings.maps_by_games(30)[:5] %}
+                    {% for map in rankings.maps_by_playertime(30)[:5] %}
                         <tr>
                             <td><a href="{{ url_for('.display_map', name=map.name) }}">{{ map.name }}</a></td>
+                            <td>{{ timeutils.span(map.time, maxunit="hour") }}</td>
                             <td>{{ map.games }}</td>
                         </tr>
                     {% endfor %}
