@@ -273,8 +273,13 @@ class Map:
                 .order_by(Game.id.desc()).all()]
 
     @staticmethod
-    def count():
+    def count(race=False):
         # Return the number of maps in the database.
+        if race:
+            return (Game.query.with_entities(Game.map)
+                    .filter(db.func.re_mode(Game.id, 'race'))
+                    .filter(db.func.re_mut(Game.id, 'timed'))
+                    .group_by(Game.map).count())
         return Game.query.with_entities(Game.map).group_by(Game.map).count()
 
     @staticmethod
@@ -299,7 +304,8 @@ class Map:
     @classmethod
     def paginate(cls, page, per_page, race=False):
         return to_pagination(page, per_page,
-                             lambda a, b: cls.all(a, b, race), cls.count)
+                             lambda a, b: cls.all(a, b, race),
+                             lambda: cls.count(True))
 
     def __init__(self, name):
         # Build a Map object from the database.
