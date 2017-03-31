@@ -1,7 +1,9 @@
 {% import 'utils/time.html' as timeutils %}
 
 {% macro fancy_team(team, size=24) -%}
-    <img src="{{ url_for('static', filename='images/teams/%d.png' % team.team) }}" alt="{{ team.name }}" title="{{ team.name }}" width="{{ size }}" height="{{ size }}">
+    {% if team %}
+        <img src="{{ url_for('static', filename='images/teams/%d.png' % team.team) }}" alt="{{ team.name }}" title="{{ team.name }}" width="{{ size }}" height="{{ size }}">
+    {% endif %}
 {%- endmacro %}
 
 {% macro fancy_game_mode(game, size=24) -%}
