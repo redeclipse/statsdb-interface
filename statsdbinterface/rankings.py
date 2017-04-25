@@ -197,7 +197,8 @@ def players_by_kdr(days):
         ret[player.handle]["deaths"] += player.deaths
     # Only count players who have played >= half the average number of games.
     # This avoids small numbers of games from skewing the values.
-    gamemin = min([sum(games.values()) / len(games) / 2, max(games.values())])
+    gamemin = min([sum(games.values()) / max(1, len(games)) / 2,
+                   max(games.values()) if games else 0])
     for h in ret:
         ret[h]['kdr'] = ret[h]['frags'] / max(1, ret[h]['deaths'])
     return [ret[h] for h in sorted([p for p in ret if games[p] >= gamemin],
@@ -248,6 +249,51 @@ def players_by_dpm(days):
                                             key=lambda p:
                                                 res_compiled[p]['dpm'],
                                             reverse=True)]
+
+
+@cached(5 * 60)
+def players_by_dpf(days):
+    """
+    Return a sorted list of players with and by dpf.
+    """
+    first_game = first_game_in_days(days)
+    res_compiled = {}
+    games = {}
+    for player in (models.GamePlayer.query.join(models.Game)
+                   .with_entities(models.GamePlayer.handle)
+                   .filter(models.GamePlayer.game_id >= first_game)
+                   .filter(models.GamePlayer.handle != "")
+                   .filter(db.func.re_normal_weapons(
+                       models.GamePlayer.game_id))
+                   .filter(models.Game.uniqueplayers > 1)):
+        if player.handle not in games:
+            games[player.handle] = 0
+        games[player.handle] += 1
+    for player in games.keys():
+        d1, d2, f1, f2 = (
+            models.GameWeapon.query
+            .with_entities(db.func.sum(models.GameWeapon.damage1),
+                           db.func.sum(models.GameWeapon.damage2),
+                           db.func.sum(models.GameWeapon.frags1),
+                           db.func.sum(models.GameWeapon.frags2))
+            .filter(models.GameWeapon.playerhandle == player)
+            .filter(models.GameWeapon.game_id >= first_game)
+            .filter(db.func.re_normal_weapons(models.GameWeapon.game_id))
+            .filter(~models.GameWeapon.weapon.in_(
+                redeclipse.versions.default.notwielded
+                ))).first()
+        res_compiled[player] = {
+            "handle": player,
+            "dpf": (((d1 or 0) + (d2 or 0)) / max(f1 + f2, 1)),
+            }
+    # Only count players who have played >= half the average number of games.
+    # This avoids small numbers of games from skewing the values.
+    gamemin = min([sum(games.values()) / max(len(games), 1) / 2,
+                   games and max(games.values()) or 0])
+    return [res_compiled[p] for p in sorted([p for p in res_compiled
+                                             if games[p] >= gamemin],
+                                            key=lambda p:
+                                                res_compiled[p]['dpf'])]
 
 
 @cached(10 * 60)

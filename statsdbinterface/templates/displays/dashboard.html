@@ -51,27 +51,6 @@
             <table class="table table-hover table-condensed">
                 <thead>
                     <tr>
-                        <th>Weapon</th>
-                        <th>Player</th>
-                        <th><span title="Damage per Minute">DPM</span></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for entry in rankings.player_weapons(7)[:5] %}
-                        <tr>
-                            <td>{{ redeclipse.fancy_weapon(entry.weapon) }}</td>
-                            <td><a href="{{ url_for('.display_player', handle=entry.handle) }}">{{ entry.handle }}</a></td>
-                            <td>{{ entry.dpm|round(0)|int }}</td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-        <div class="col-md-3">
-            <h4>Most <span title="Damage per Minute">DPM</span></h4>
-            <table class="table table-hover table-condensed">
-                <thead>
-                    <tr>
                         <th>Player</th>
                         <th><span title="Damage per Minute">DPM</span></th>
                     </tr>
@@ -81,6 +60,39 @@
                         <tr>
                             <td><a href="{{ url_for('.display_player', handle=player.handle) }}">{{ player.handle }}</a></td>
                             <td>{{ player.dpm|round(0)|int }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="col-md-3">
+            <h4><span title="Damage per Frag">DPF</span></h4>
+            <table class="table table-hover table-condensed">
+                <thead>
+                    <tr>
+                        <th>Player</th>
+                        <th>Least <span title="Damage per Frag">DPF</span></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for player in rankings.players_by_dpf(7)[:3] %}
+                        <tr>
+                            <td><a href="{{ url_for('.display_player', handle=player.handle) }}">{{ player.handle }}</a></td>
+                            <td>{{ player.dpf|round(0)|int }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+                <thead>
+                    <tr>
+                        <th>Player</th>
+                        <th>Most <span title="Damage per Frag">DPF</span></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for player in (rankings.players_by_dpf(7)|reverse|list)[:2] %}
+                        <tr>
+                            <td><a href="{{ url_for('.display_player', handle=player.handle) }}">{{ player.handle }}</a></td>
+                            <td>{{ player.dpf|round(0)|int }}</td>
                         </tr>
                     {% endfor %}
                 </tbody>
