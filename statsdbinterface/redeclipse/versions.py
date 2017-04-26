@@ -2,7 +2,7 @@ from ..database.core import db
 from collections import OrderedDict
 
 
-DEFAULT_VERSION = "1.5.6"
+DEFAULT_VERSION = "1.5.8"
 
 registry = []
 game_cache = {}
@@ -125,7 +125,7 @@ class RE:
 class RE_1_5_dev(RE):
     # Limits
     start = "1.5.4"
-    end = "1.5.6"
+    end = "1.5.8"
 
     # Weapon Lists
     loadoutweaponlist = [
