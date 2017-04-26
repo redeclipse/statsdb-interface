@@ -46,8 +46,8 @@ def build_precache():
     for vclass in registry:
         for r in (Game.query.with_entities(Game.id)
                   .join(Game.server)
-                  .filter(db.func.re_ver(GameServer.version, vclass.startstr,
-                                         vclass.endstr)).all()):
+                  .filter(db.func.re_ver(GameServer.version,
+                                         type(vclass).__name__)).all()):
                         game_cache[r[0]] = vclass.startstr
 
 

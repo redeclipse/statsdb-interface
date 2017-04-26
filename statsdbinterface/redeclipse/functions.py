@@ -69,12 +69,8 @@ re_mode.lastprecache = 0
 
 
 @db_function('re_ver')
-def re_ver(version, vmin, vmax):
-    vmin = versions.version_str_to_tuple(vmin)
-    vmax = versions.version_str_to_tuple(vmax)
-    v = versions.version_str_to_tuple(version)
-
-    return vmin <= v <= vmax
+def re_ver(version, vclass):
+    return type(versions.get_version_class(version)).__name__ == vclass
 
 
 def build_precache():
@@ -92,8 +88,8 @@ def build_precache():
                 r[0] for r in
                 Game.query.with_entities(Game.id)
                 .join(Game.server)
-                .filter(db.func.re_ver(GameServer.version, vclass.startstr,
-                                       vclass.endstr))
+                .filter(db.func.re_ver(GameServer.version,
+                                       type(vclass).__name__))
                 .filter(Game.mode == vclass.modes[mode]).all()
             ]
         for mut in vclass.mutators:
@@ -103,7 +99,7 @@ def build_precache():
                 r[0] for r in
                 Game.query.with_entities(Game.id)
                 .join(Game.server)
-                .filter(db.func.re_ver(GameServer.version, vclass.startstr,
-                                       vclass.endstr))
+                .filter(db.func.re_ver(GameServer.version,
+                                       type(vclass).__name__))
                 .filter(Game.mutators.op('&')(vclass.mutators[mut])).all()
             ]
