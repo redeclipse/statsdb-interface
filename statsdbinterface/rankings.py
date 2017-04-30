@@ -284,7 +284,7 @@ def players_by_dpf(days):
                 ))).first()
         res_compiled[player] = {
             "handle": player,
-            "dpf": (((d1 or 0) + (d2 or 0)) / max(f1 + f2, 1)),
+            "dpf": (((d1 or 0) + (d2 or 0)) / max((f1 or 0) + (f2 or 0), 1)),
             }
     # Only count players who have played >= half the average number of games.
     # This avoids small numbers of games from skewing the values.
