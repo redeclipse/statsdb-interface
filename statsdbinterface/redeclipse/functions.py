@@ -83,23 +83,23 @@ def build_precache():
     for vclass in versions.registry:
         for mode in vclass.modes:
             if mode not in re_mode.precache:
-                re_mode.precache[mode] = []
-            re_mode.precache[mode] += [
+                re_mode.precache[mode] = set()
+            re_mode.precache[mode] |= set([
                 r[0] for r in
                 Game.query.with_entities(Game.id)
                 .join(Game.server)
                 .filter(db.func.re_ver(GameServer.version,
                                        type(vclass).__name__))
                 .filter(Game.mode == vclass.modes[mode]).all()
-            ]
+            ])
         for mut in vclass.mutators:
             if mut not in re_mut.precache:
-                re_mut.precache[mut] = []
-            re_mut.precache[mut] += [
+                re_mut.precache[mut] = set()
+            re_mut.precache[mut] |= set([
                 r[0] for r in
                 Game.query.with_entities(Game.id)
                 .join(Game.server)
                 .filter(db.func.re_ver(GameServer.version,
                                        type(vclass).__name__))
                 .filter(Game.mutators.op('&')(vclass.mutators[mut])).all()
-            ]
+            ])
