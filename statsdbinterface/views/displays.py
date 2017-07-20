@@ -54,7 +54,7 @@ def display_game(gameid):
                                              models.GameWeapon.timewielded))
                                          .filter(models.GameWeapon
                                                  .game_id == game.id)
-                                         .first()[0]))
+                                         .first()[0]) or 0)
 
 
 @bp.route("/servers")
@@ -248,7 +248,7 @@ def display_weapons():
                                         .filter(models.GameWeapon.game_id.in_(
                                             games
                                             ))
-                                        .first()[0])
+                                        .first()[0] or 0)
                           )
     return ret
 
