@@ -14,15 +14,15 @@
             </tr>
         </thead>
         <tbody>
-            {% for mode in modes %}
+            {% for mode in all %}
                 <tr>
                     <td>{{ redeclipse.fancy_mode(mode, 32) }}</td>
-                    <td>{{ mode.game_ids|count }}</td>
+                    <td>{{ mode.games }}</td>
                 <tr>
             {% endfor %}
         </tbody>
     </table>
-    <h3>Last 30 days</h3>
+    <h3>Last {{recent_days}} days</h3>
     <table class="table table-hover table-condensed">
         <thead>
             <tr>
@@ -31,7 +31,7 @@
             </tr>
         </thead>
         <tbody>
-            {% for mode in rankings.modes_by_games(30) %}
+            {% for mode in recent %}
                 <tr>
                     <td>{{ redeclipse.fancy_mode(mode, 32) }}</td>
                     <td>{{ mode.games }}</td>

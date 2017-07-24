@@ -10,7 +10,7 @@
     <p>Played {{ timeutils.ago(game.time, short=False) }}.</p>
     <p><a href="{{ url_for('.display_server', handle=game.server.handle) }}">{{game.server.desc}} [{{game.server.handle}}] - {{game.server.host}}:{{game.server.port}}</a></p>
     {{ redeclipse.fancy_game_mode(game, 32) }} {{ redeclipse.fancy_mutators(game, 0) }} on <a href="{{ url_for('.display_map', name=game.map) }}">{{ game.map }}</a>
-    {% if game.teams.count() > 1 %}
+    {% if game.teams|length > 1 %}
         <table class="table table-hover table-condensed">
             <thead>
                 <tr>
@@ -62,13 +62,13 @@
                     <td>{{ redeclipse.per_minute(player, player.deaths) }}</td>
                     {% if not game.is_peaceful() %}
                         <td>{{ (player.frags/(player.deaths|sdiv))|round(1) }}</td>
-                        <td>{{ redeclipse.per_minute(player, player.damage()) }}</td>
+                        <td>{{ redeclipse.per_minute(player, damage[player.wid]) }}</td>
                     {% endif %}
                 <tr>
             {% endfor %}
         </tbody>
     </table>
-    {% if game.ffarounds.count() %}
+    {% if game.ffarounds|length %}
         <table class="table table-hover table-condensed">
             <thead>
                 <tr>
@@ -94,7 +94,7 @@
             </tbody>
         </table>
     {% endif %}
-    {% if game.captures.count() %}
+    {% if game.captures|length %}
         <table class="table table-hover table-condensed">
             <thead>
                 <tr>
@@ -107,14 +107,14 @@
                 {% for capture in game.captures %}
                     <tr>
                         <td>{{ redeclipse.wid_to_player(game, capture.player) }}</td>
-                        <td>{{ redeclipse.fancy_team(game.teams.filter_by(team=capture.capturing).first()) }}</td>
-                        <td>{{ redeclipse.fancy_team(game.teams.filter_by(team=capture.captured).first()) }}</td>
+                        <td>{{ redeclipse.fancy_team(capture.capturing_team) }}</td>
+                        <td>{{ redeclipse.fancy_team(capture.captured_team) }}</td>
                     </tr>
                 {% endfor %}
             </tbody>
         </table>
     {% endif %}
-    {% if game.bombings.count() %}
+    {% if game.bombings|length %}
         <table class="table table-hover table-condensed">
             <thead>
                 <tr>
@@ -127,8 +127,8 @@
                 {% for bombing in game.bombings %}
                     <tr>
                         <td>{{ redeclipse.wid_to_player(game, bombing.player) }}</td>
-                        <td>{{ redeclipse.fancy_team(game.teams.filter_by(team=bombing.bombed).first()) }}</td>
-                        <td>{{ redeclipse.fancy_team(game.teams.filter_by(team=bombing.bombing).first()) }}</td>
+                        <td>{{ redeclipse.fancy_team(bombing.bombing_team) }}</td>
+                        <td>{{ redeclipse.fancy_team(bombing.bombed_team) }}</td>
                     </tr>
                 {% endfor %}
             </tbody>

@@ -18,10 +18,10 @@
             {% for server in pager.items %}
                 <tr>
                     <td><a href="{{ url_for('.display_server', handle=server.handle) }}">{{ server.handle }}</a></td>
-                    <td>{{ server.latest.desc }}</td>
-                    <td>{{ server.game_ids|count }}</td>
-                    <td><a title="{{ server.first.game.time|time_ago }} ago, {{ server.first.game.time|time_str }}" href="{{ url_for('.display_game', gameid=server.first.game_id) }}">{{ server.first.game_id }}</a></td>
-                    <td><a title="{{ server.latest.game.time|time_ago }} ago, {{ server.latest.game.time|time_str }}" href="{{ url_for('.display_game', gameid=server.latest.game_id) }}">{{ server.latest.game_id }}</a></td>
+                    <td>{{ server.desc }}</td>
+                    <td>{{ server.game_count }}</td>
+                    <td><a title="{{ server.first_time|time_ago }} ago, {{ server.first_time|time_str }}" href="{{ url_for('.display_game', gameid=server.first_game) }}">{{ server.first_game }}</a></td>
+                    <td><a title="{{ server.last_time|time_ago }} ago, {{ server.last_time|time_str }}" href="{{ url_for('.display_game', gameid=server.last_game) }}">{{ server.last_game }}</a></td>
                 <tr>
             {% endfor %}
         </tbody>

@@ -7,8 +7,7 @@
 
 {% block content %}
     <h3>{{ mode.longname }}</h3>
-    <p>{{ mode.game_ids|count }} games total.</p>
-    {% set games = mode.recent_games(config.DISPLAY_RESULTS_RECENT) %}
+    <p>{{ game_count }} games total.</p>
     {% include 'tables/games.html' %}
     <a href="{{ url_for('.display_mode_games', name=mode.name) }}" class="btn btn-default pull-right">More...</a>
 {% endblock content %}

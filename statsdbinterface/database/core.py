@@ -14,8 +14,9 @@ def setup_db(app):
     db.init_app(app)
 
     # Register models, functions and views.
-    from .. import redeclipse, views  # noqa
+    from .. import views  # noqa
     from . import models  # noqa
 
     with app.app_context():
-        redeclipse.versions.build_precache()
+        models.Mode.init()
+        models.Mutator.init()

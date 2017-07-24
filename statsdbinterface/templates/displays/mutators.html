@@ -14,7 +14,7 @@
             </tr>
         </thead>
         <tbody>
-            {% for mutator in mutators %}
+            {% for mutator in all %}
                 <tr>
                     <td><a href="{{ url_for('.display_mutator', name=mutator.link) }}">{{ mutator.link }}</a></td>
                     <td>{{ mutator.games }}</td>
@@ -22,7 +22,7 @@
             {% endfor %}
         </tbody>
     </table>
-    <h3>Last 30 days</h3>
+    <h3>Last {{recent_days}} days</h3>
     <table class="table table-hover table-condensed">
         <thead>
             <tr>
@@ -31,7 +31,7 @@
             </tr>
         </thead>
         <tbody>
-            {% for mutator in rankings.mutators_by_games(30) %}
+            {% for mutator in recent %}
                 <tr>
                     <td><a href="{{ url_for('.display_mutator', name=mutator.link) }}">{{ mutator.link }}</a></td>
                     <td>{{ mutator.games }}</td>

@@ -26,13 +26,14 @@
                 <td>{{ timeutils.ago(game.time) }}</td>
                 <td>{{ timeutils.span(game.timeplayed) }}</td>
                 <td>{{ game.players|length }}</td>
-                <td>{{ redeclipse.render_score(game, player.game_player(game.id)) }}
+                {% set game_player = game.player(player.handle) %}
+                <td>{{ redeclipse.render_score(game, game_player) }}
                 {% if game.is_peaceful() %}
                     <td>-</td>
                 {% else %}
-                    <td>{{ redeclipse.per_minute(player.game_player(game.id), player.game_player(game.id).frags) }}</td>
+                    <td>{{ redeclipse.per_minute(game_player, game_player.frags) }}</td>
                 {% endif %}
-                <td>{{ redeclipse.per_minute(player.game_player(game.id), player.game_player(game.id).deaths) }}</td>
+                <td>{{ redeclipse.per_minute(game_player, game_player.deaths) }}</td>
             <tr>
         {% endfor %}
     </tbody>

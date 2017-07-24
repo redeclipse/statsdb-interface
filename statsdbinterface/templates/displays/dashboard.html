@@ -7,7 +7,7 @@
 
 {% block content %}
     <div class="row">
-        <h3>Last 7 days</h3>
+        <h3>Last {{short}} days</h3>
         <div class="col-md-3">
             <h4>Most games</h4>
             <table class="table table-hover table-condensed">
@@ -18,7 +18,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for player in rankings.players_by_games(7)[:5] %}
+                    {% for player in players_by_games %}
                         <tr>
                             <td><a href="{{ url_for('.display_player', handle=player.handle) }}">{{ player.handle }}</a></td>
                             <td>{{ player.games }}</td>
@@ -37,7 +37,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for server in rankings.servers_by_games(7)[:5] %}
+                    {% for server in servers_by_games %}
                         <tr>
                             <td><a href="{{ url_for('.display_server', handle=server.handle) }}">{{ server.handle }}</a></td>
                             <td>{{ server.games }}</td>
@@ -56,7 +56,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for player in rankings.players_by_dpm(7)[:5] %}
+                    {% for player in players_by_dpm[:5] %}
                         <tr>
                             <td><a href="{{ url_for('.display_player', handle=player.handle) }}">{{ player.handle }}</a></td>
                             <td>{{ player.dpm|round(0)|int }}</td>
@@ -75,7 +75,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for player in rankings.players_by_dpf(7)[:3] %}
+                    {% for player in players_by_dpf[:3] %}
                         <tr>
                             <td><a href="{{ url_for('.display_player', handle=player.handle) }}">{{ player.handle }}</a></td>
                             <td>{{ player.dpf|round(0)|int }}</td>
@@ -89,7 +89,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for player in (rankings.players_by_dpf(7)|reverse|list)[:2] %}
+                    {% for player in players_by_dpf[-2:]|reverse %}
                         <tr>
                             <td><a href="{{ url_for('.display_player', handle=player.handle) }}">{{ player.handle }}</a></td>
                             <td>{{ player.dpf|round(0)|int }}</td>
@@ -100,7 +100,7 @@
         </div>
     </div>
     <div class="row">
-        <h3>Last 30 days</h3>
+        <h3>Last {{long}} days</h3>
         <div class="col-md-3">
             <h4>Most played</h4>
             <table class="table table-hover table-condensed">
@@ -112,7 +112,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for map in rankings.maps_by_playertime(30)[:5] %}
+                    {% for map in maps_by_playertime %}
                         <tr>
                             <td><a href="{{ url_for('.display_map', name=map.name) }}">{{ map.name }}</a></td>
                             <td>{{ timeutils.span(map.time, maxunit="hour") }}</td>
@@ -132,7 +132,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for weapon in rankings.weapons_by_wielded(30)[:5] %}
+                    {% for weapon in weapons_by_wielded[:5] %}
                         <tr>
                             <td>{{ redeclipse.fancy_weapon(weapon.name) }}</td>
                             <td>{{ (weapon.timewielded * 100)|round(0)|int }}%</td>
@@ -151,7 +151,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for weapon in rankings.weapons_by_dpm(30)[:5] %}
+                    {% for weapon in weapons_by_dpm[:5] %}
                         <tr>
                             <td>{{ redeclipse.fancy_weapon(weapon.name) }}</td>
                             <td>{{ weapon.dpm|round(0)|int }}</td>
@@ -170,7 +170,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for player in rankings.players_by_kdr(30)[:5] %}
+                    {% for player in players_by_kdr[:5] %}
                         <tr>
                             <td><a href="{{ url_for('.display_player', handle=player.handle) }}">{{ player.handle }}</a></td>
                             <td>{{ player.kdr|round(1) }}</td>
