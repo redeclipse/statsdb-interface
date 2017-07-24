@@ -36,10 +36,10 @@ def display_games():
                            Game=models.Game,
                            gametime=models.Game.query.with_entities(
                                    db.func.sum(models.Game.timeplayed)
-                               ).first()[0],
+                               ).scalar(),
                            playertime=models.GamePlayer.query.with_entities(
                                    db.func.sum(models.GamePlayer.timeactive)
-                               ).first()[0])
+                               ).scalar())
 
 
 @bp.route("/game/<int:gameid>")
@@ -54,7 +54,7 @@ def display_game(gameid):
                                              models.GameWeapon.timewielded))
                                          .filter(models.GameWeapon
                                                  .game_id == game.id)
-                                         .first()[0]) or 0)
+                                         .scalar()) or 0)
 
 
 @bp.route("/servers")
@@ -100,26 +100,49 @@ def display_players():
 @bp.route("/players/<string:handle>")
 def display_player(handle):
     player = extmodels.Player.get_or_404(handle)
-    games = (models.Game.query
-             .with_entities(models.Game.id)
-             .filter(~db.func.re_mode(models.Game.id, 'race'))
-             .filter(~db.func.re_mut(models.Game.id, 'insta'))
-             .filter(~db.func.re_mut(models.Game.id, 'medieval'))
-             .filter(models.Game.id.in_(player.game_ids))
-             .order_by(models.Game.id.desc()).limit(50))
-    weapons = extmodels.Weapon.all_from_player_games(handle, games)
+
+    games = db.session.query(models.GamePlayer) \
+        .join(models.Game) \
+        .filter(models.GamePlayer.handle == handle) \
+        .filter(models.Game.normalweapons == 1) \
+        .limit(50)
+
+    timealive, frags, deaths = 0, 0, 0
+    for g in games.all():
+        timealive += g.timealive
+        frags += g.frags
+        deaths += g.deaths
+
+    games = games.subquery()
+    weapons = db.session.query(
+            models.GameWeapon.weapon.label('name'),
+            db.func.sum(models.GameWeapon.timeloadout).label('timeloadout'),
+            db.func.sum(models.GameWeapon.timewielded).label('timewielded'),
+            db.func.sum(models.GameWeapon.damage1).label('damage1'),
+            db.func.sum(models.GameWeapon.damage2).label('damage2'),
+            db.func.sum(models.GameWeapon.frags1).label('frags1'),
+            db.func.sum(models.GameWeapon.frags2).label('frags2')) \
+        .select_from(games) \
+        .join(models.GameWeapon,
+              db.and_(games.c.game == models.GameWeapon.game_id,
+                      games.c.wid == models.GameWeapon.player)) \
+        .filter(models.GameWeapon.weapon.in_(extmodels.Weapon.weapon_list())) \
+        .group_by(models.GameWeapon.weapon) \
+        .all()
+
+    totalwielded, damage = 0, 0
+    for w in weapons:
+        totalwielded += w.timewielded or w.timeloadout
+        damage += w.damage1 + w.damage2
+
     return render_template('displays/player.html',
                            player=player,
+                           dpm=damage / (timealive / 60),
+                           fpm=frags / (timealive / 60),
+                           kdr=frags / deaths,
+                           dfr=damage / frags,
                            weapons=weapons,
-                           totalwielded=(models.GameWeapon.query
-                                         .with_entities(db.func.sum(
-                                             models.GameWeapon.timewielded))
-                                         .filter(models.GameWeapon.game_id.in_(
-                                             games
-                                             ))
-                                         .filter(models.GameWeapon
-                                                 .playerhandle == handle)
-                                         .first()[0]) or 0)
+                           totalwielded=totalwielded)
 
 
 @bp.route("/player:games/<string:handle>")
@@ -206,9 +229,7 @@ def display_mode_games(name):
 @bp.route("/mutators")
 def display_mutators():
     ret = render_template('displays/mutators.html',
-                          mutators=sorted(extmodels.Mutator.all(),
-                                          key=lambda m: len(m.game_ids),
-                                          reverse=True),
+                          mutators=rankings.mutators_by_games(),
                           rankings=rankings)
     return ret
 
@@ -236,7 +257,7 @@ def display_mutator_games(name):
 def display_weapons():
     games = (models.Game.query
              .with_entities(models.Game.id)
-             .filter(db.func.re_normal_weapons(models.Game.id))
+             .filter(models.Game.normalweapons == 1)
              .order_by(models.Game.id.desc()).limit(300))
     weapons = extmodels.Weapon.all_from_games(games)
 
@@ -248,8 +269,7 @@ def display_weapons():
                                         .filter(models.GameWeapon.game_id.in_(
                                             games
                                             ))
-                                        .first()[0] or 0)
-                          )
+                                        .scalar() or 0))
     return ret
 
 

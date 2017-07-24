@@ -1,6 +1,12 @@
 import time
 from threading import Thread, Lock
 import atexit
+try:
+    import config
+    cache_enabled = config.CACHE
+except ImportError:
+    cache_enabled = True
+
 cache = {}
 cache_cleaner_thread = None
 cache_lock = Lock()
@@ -11,6 +17,9 @@ def cached(seconds, cattr=None):
     """
     Decorator, registers function to the cache.
     """
+    if not cache_enabled:
+        return lambda f: f
+
     def wrapper(f):
         def function(*args, **kwargs):
             # Construct key from the function id and arguments.
@@ -58,6 +67,8 @@ def cancel_cleaner():
 
 
 def setup():
+    if not cache_enabled:
+        return
     global cache_cleaner_running, cache_cleaner_thread
     if cache_cleaner_running:
         return

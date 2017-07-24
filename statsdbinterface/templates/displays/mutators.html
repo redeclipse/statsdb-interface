@@ -16,8 +16,8 @@
         <tbody>
             {% for mutator in mutators %}
                 <tr>
-                    <td><a href="{{ url_for('.display_mutator', name=mutator.name) }}">{{ mutator.name }}</a></td>
-                    <td>{{ mutator.game_ids|count }}</td>
+                    <td><a href="{{ url_for('.display_mutator', name=mutator.link) }}">{{ mutator.link }}</a></td>
+                    <td>{{ mutator.games }}</td>
                 <tr>
             {% endfor %}
         </tbody>
@@ -33,7 +33,7 @@
         <tbody>
             {% for mutator in rankings.mutators_by_games(30) %}
                 <tr>
-                    <td><a href="{{ url_for('.display_mutator', name=mutator.name) }}">{{ mutator.name }}</a></td>
+                    <td><a href="{{ url_for('.display_mutator', name=mutator.link) }}">{{ mutator.link }}</a></td>
                     <td>{{ mutator.games }}</td>
                 <tr>
             {% endfor %}

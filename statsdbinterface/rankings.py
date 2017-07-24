@@ -25,17 +25,17 @@ def weapon_sums(days, use_totalwielded=True):
     totalwielded = 0
     if use_totalwielded:
         totalwielded = (models.GameWeapon.query
+                        .join(models.Game)
                         .with_entities(db.func.sum(
                             models.GameWeapon.timewielded))
                         .filter(models.GameWeapon.game_id >= first_game)
-                        .filter(db.func.re_normal_weapons(
-                            models.GameWeapon.game_id))
+                        .filter(models.Game.normalweapons == 1)
                         .filter(models.GameWeapon.weapon.in_(
                             redeclipse.versions.default.standardweaponlist))
                         .first()[0])
     weapons = extmodels.Weapon.all_from_f((
         models.GameWeapon.game_id >= first_game,
-        db.func.re_normal_weapons(models.GameWeapon.game_id),
+        models.Game.normalweapons == 1,
         models.GameWeapon.weapon.in_(
             redeclipse.versions.default.standardweaponlist)))
     return {
@@ -114,50 +114,40 @@ def players_by_games(days):
 
 @cached(60)
 def modes_by_games(days):
-    re = redeclipse.versions.default
     first_game = first_game_in_days(days)
-    modes = extmodels.Mode.mode_list()
+    modes = models.Mode.query \
+        .filter(models.Mode.name.notin_(['edit', 'demo'])) \
+        .all()
     ret = []
     for mode in modes:
-        m = {
-            'name': mode,
-            'longname': re.modestr[re.modes[mode]],
-            'games': 0,
-            }
-        m['games'] = models.Game.query.filter(
-            db.func.re_mode(models.Game.id, mode),
-            models.Game.id >= first_game
-            ).count()
+        m = {'name': mode.name,
+             'longname': mode.longname,
+             'games': mode.games.filter(models.Game.id >= first_game)
+                                .count()}
         ret.append(m)
     return sorted(ret, key=lambda m: m['games'], reverse=True)
 
 
 @cached(60)
-def mutators_by_games(days):
-    first_game = first_game_in_days(days)
-    mutators = extmodels.Mutator.mutator_list()
+def mutators_by_games(days=None):
+    first_game = 0 if days is None else first_game_in_days(days)
+    mutators = db.session.query(models.Mutator,
+                                db.func.count(models.Game.id)) \
+        .join(models.Mutator.games) \
+        .filter(models.Game.id >= first_game) \
+        .group_by(models.Mutator.id) \
+        .order_by(db.func.count(models.Game.id).desc()) \
+        .all()
     ret = []
-    for mutator in mutators:
+    for mutator, game_count in mutators:
         m = {
-            'name': mutator,
-            'link': mutator,
-            'longname': mutator,
-            'games': 0,
-            }
-        if '-' in mutator:
-            mode, mut = mutator.split('-')
-            m['games'] = models.Game.query.filter(
-                db.func.re_mode(models.Game.id, mode),
-                db.func.re_mut(models.Game.id, mut),
-                models.Game.id >= first_game
-                ).count()
-        else:
-            m['games'] = models.Game.query.filter(
-                db.func.re_mut(models.Game.id, mutator),
-                models.Game.id >= first_game
-                ).count()
+            'name': mutator.name,
+            'link': mutator.link,
+            'shortname': mutator.shortname,
+            'games': game_count
+        }
         ret.append(m)
-    return sorted(ret, key=lambda m: m['games'], reverse=True)
+    return ret
 
 
 @cached(60)
@@ -218,21 +208,20 @@ def players_by_dpm(days):
                    .with_entities(models.GamePlayer.handle)
                    .filter(models.GamePlayer.game_id >= first_game)
                    .filter(models.GamePlayer.handle != "")
-                   .filter(db.func.re_normal_weapons(
-                       models.GamePlayer.game_id))
+                   .filter(models.Game.normalweapons == 1)
                    .filter(models.Game.uniqueplayers > 1)):
         if player.handle not in games:
             games[player.handle] = 0
         games[player.handle] += 1
     for player in games.keys():
         d1, d2, timewielded = (
-            models.GameWeapon.query
+            models.GameWeapon.query.join(models.Game)
             .with_entities(db.func.sum(models.GameWeapon.damage1),
                            db.func.sum(models.GameWeapon.damage2),
                            db.func.sum(models.GameWeapon.timewielded))
             .filter(models.GameWeapon.playerhandle == player)
             .filter(models.GameWeapon.game_id >= first_game)
-            .filter(db.func.re_normal_weapons(models.GameWeapon.game_id))
+            .filter(models.Game.normalweapons == 1)
             .filter(~models.GameWeapon.weapon.in_(
                 redeclipse.versions.default.notwielded
                 ))).first()
@@ -263,22 +252,21 @@ def players_by_dpf(days):
                    .with_entities(models.GamePlayer.handle)
                    .filter(models.GamePlayer.game_id >= first_game)
                    .filter(models.GamePlayer.handle != "")
-                   .filter(db.func.re_normal_weapons(
-                       models.GamePlayer.game_id))
+                   .filter(models.Game.normalweapons == 1)
                    .filter(models.Game.uniqueplayers > 1)):
         if player.handle not in games:
             games[player.handle] = 0
         games[player.handle] += 1
     for player in games.keys():
         d1, d2, f1, f2 = (
-            models.GameWeapon.query
+            models.GameWeapon.query.join(models.Game)
             .with_entities(db.func.sum(models.GameWeapon.damage1),
                            db.func.sum(models.GameWeapon.damage2),
                            db.func.sum(models.GameWeapon.frags1),
                            db.func.sum(models.GameWeapon.frags2))
             .filter(models.GameWeapon.playerhandle == player)
             .filter(models.GameWeapon.game_id >= first_game)
-            .filter(db.func.re_normal_weapons(models.GameWeapon.game_id))
+            .filter(models.Game.normalweapons == 1)
             .filter(~models.GameWeapon.weapon.in_(
                 redeclipse.versions.default.notwielded
                 ))).first()
@@ -302,10 +290,10 @@ def player_weapons(days):
     Return a sorted list of weapons and their best players with the most FPM.
     """
     first_game = first_game_in_days(days)
-    res = (models.GameWeapon.query
+    res = (models.GameWeapon.query.join(models.Game)
            .filter(models.GameWeapon.game_id >= first_game)
            .filter(models.GameWeapon.playerhandle != "")
-           .filter(db.func.re_normal_weapons(models.GameWeapon.game_id))
+           .filter(models.Game.normalweapons == 1)
            .filter(models.GameWeapon.weapon.in_(
                redeclipse.versions.default.standardweaponlist))).all()
     weapons = {}

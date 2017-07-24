@@ -34,21 +34,18 @@ def get_version_class(version):
 
 
 def get_game_version(game_id):
-    from ..database.models import Game
+    from ..database.models import GameServer
     if game_id not in game_cache:
-        game_cache[game_id] = Game.query.filter(
-            Game.id == game_id).first().server[0].version
+        game_cache[game_id] = db.session.query(GameServer.version) \
+                .filter_by(game_id=game_id).scalar()
     return get_version_class(game_cache[game_id])
 
 
 def build_precache():
-    from ..database.models import Game, GameServer
-    for vclass in registry:
-        for r in (Game.query.with_entities(Game.id)
-                  .join(Game.server)
-                  .filter(db.func.re_ver(GameServer.version,
-                                         type(vclass).__name__)).all()):
-                        game_cache[r[0]] = vclass.startstr
+    from ..database.models import GameServer
+    for gid, version in db.session.query(GameServer.game_id,
+                                         GameServer.version).all():
+        game_cache[gid] = get_version_class(version).startstr
 
 
 def reversion(c):
@@ -138,14 +135,14 @@ class RE_1_5_dev(RE):
 
     # Mode Lists
     modes = {
-        "demo": 0,
-        "edit": 1,
-        "dm": 2,
-        "ctf": 3,
-        "dac": 4,
-        "bb": 5,
-        "race": 6,
-        }
+        "bb": 1,
+        "ctf": 2,
+        "dac": 3,
+        "demo": 4,
+        "dm": 5,
+        "edit": 6,
+        "race": 7,
+    }
 
     # Mutators
     mutators = {}
@@ -174,5 +171,6 @@ class RE_1_5_dev(RE):
         "Demo", "Editing", "Deathmatch",
         "Capture the Flag", "Defend and Control", "Bomber Ball", "Race"
     ]
+
 
 default = get_version_class(DEFAULT_VERSION)

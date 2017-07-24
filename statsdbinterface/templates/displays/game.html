@@ -8,7 +8,7 @@
 {% block content %}
     <h3>Game {{ game.id }}</h3>
     <p>Played {{ timeutils.ago(game.time, short=False) }}.</p>
-    <p><a href="{{ url_for('.display_server', handle=game.server[0].handle) }}">{{game.server[0].desc}} [{{game.server[0].handle}}] - {{game.server[0].host}}:{{game.server[0].port}}</a></p>
+    <p><a href="{{ url_for('.display_server', handle=game.server.handle) }}">{{game.server.desc}} [{{game.server.handle}}] - {{game.server.host}}:{{game.server.port}}</a></p>
     {{ redeclipse.fancy_game_mode(game, 32) }} {{ redeclipse.fancy_mutators(game, 0) }} on <a href="{{ url_for('.display_map', name=game.map) }}">{{ game.map }}</a>
     {% if game.teams.count() > 1 %}
         <table class="table table-hover table-condensed">

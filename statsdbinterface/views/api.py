@@ -119,12 +119,11 @@ def api_games():
     return resp
 
 
-@bp.route("/api/games/<int:gameid>")
+@bp.route("/games/<int:gameid>")
 def api_game(gameid):
     """
     Return a single game.
     """
-
     game = models.Game.query.filter_by(id=gameid).first_or_404()
     resp = jsonify(game.to_dict())
     return resp
