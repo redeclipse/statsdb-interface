@@ -14,7 +14,7 @@
         </thead>
         <tbody>
             {% for time in times %}
-                <tr>
+                <tr title="{{ time.players|round(2) }} players online on average">
                     <td>{{ time.label }}</td>
                     <td>{{ time.bar }}</td>
                 <tr>

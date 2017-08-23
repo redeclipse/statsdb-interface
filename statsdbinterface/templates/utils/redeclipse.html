@@ -16,7 +16,7 @@
 
 {% macro fancy_mutators(game, maxlong=3) -%}
     <ul class="delim-list dash-delim-list">
-        {%- for mutator in game.mutator_dict_list(maxlong) %}<li><a href="{{ url_for('.display_mutator', name=mutator.link) }}" title="{{ mutator.longname }}">{{ mutator.name }}</a></li>{%- endfor %}
+        {%- for mutator in game.mutators %}<li><a href="{{ url_for('.display_mutator', name=mutator.link) }}" title="{{ mutator.longname }}">{% if game.mutators|length < maxlong %}{{ mutator.name }}{% else %}{{ mutator.shortname }}{% endif %}</a></li>{%- endfor %}
     </ul>
 {%- endmacro %}
 

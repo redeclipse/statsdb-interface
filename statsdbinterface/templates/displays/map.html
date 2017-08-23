@@ -6,10 +6,10 @@
 
 {% block content %}
     <h3>{{ map.name }}</h3>
-    <p>First seen {{ timeutils.ago(map.first.time, False) }} with <a href="{{ url_for('.display_game', gameid=map.first.id) }}">game {{ map.first.id }}</a>, Last seen {{ timeutils.ago(map.latest.time, False) }} with <a href="{{ url_for('.display_game', gameid=map.latest.id) }}">game {{ map.latest.id }}</a>, {{ map.game_ids|count }} games total.</p>
-    <p>Time on server: {{ timeutils.span(map.gametime, exact=True, maxunit="hour") }}, Combined player time: {{ timeutils.span(map.playertime, exact=True, maxunit="hour") }}</p>
+    <p>First seen {{ timeutils.ago(map.first_time, False) }} with <a href="{{ url_for('.display_game', gameid=map.first_game) }}">game {{ map.first_game }}</a>, Last seen {{ timeutils.ago(map.last_time, False) }} with <a href="{{ url_for('.display_game', gameid=map.last_game) }}">game {{ map.last_game }}</a>, {{ map.game_count }} games total.</p>
+    <p>Time on server: {{ timeutils.span(map.time_played, exact=True, maxunit="hour") }}, Combined player time: {{ timeutils.span(player_time, exact=True, maxunit="hour") }}</p>
     <div class="row">
-        {% if map.topraces() %}
+        {% if top_races %}
             <div class="col-md-6">
                 <h4>Top race times</h4>
                 <table class="table table-hover table-condensed">
@@ -23,20 +23,20 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {% for toprace in map.topraces()[:5] %}
+                        {% for race in top_races %}
                             <tr>
-                                <td>{{ timeutils.span(toprace.score / 1000, exact=True, decimal=True) }}</td>
-                                <td>{{ toprace.name }}</td>
-                                <td>{% if toprace.handle %}<a href="{{ url_for('.display_player', handle=toprace.handle) }}">{{ toprace.handle }}</a>{% endif %}</td>
-                                <td><a href="{{ url_for('.display_game', gameid=toprace.game_id) }}">{{ toprace.game_id }}</a></td>
-                                <td>{{ timeutils.ago(toprace.when, False) }}</td>
+                                <td>{{ timeutils.span(race.score / 1000, exact=True, decimal=True) }}</td>
+                                <td>{{ race.name }}</td>
+                                <td>{% if race.handle %}<a href="{{ url_for('.display_player', handle=race.handle) }}">{{ race.handle }}</a>{% endif %}</td>
+                                <td><a href="{{ url_for('.display_game', gameid=race.game_id) }}">{{ race.game_id }}</a></td>
+                                <td>{{ timeutils.ago(race.when, False) }}</td>
                             </tr>
                         {% endfor %}
                     </tbody>
                 </table>
             </div>
         {% endif %}
-        {% if map.topraces(True) %}
+        {% if top_endurance_races %}
             <div class="col-md-6">
                 <h4>Top endurance race times</h4>
                 <table class="table table-hover table-condensed">
@@ -50,13 +50,13 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {% for toprace in map.topraces(True)[:5] %}
+                        {% for race in top_endurance_races %}
                             <tr>
-                                <td>{{ timeutils.span(toprace.score / 1000, exact=True, decimal=True) }}</td>
-                                <td>{{ toprace.name }}</td>
-                                <td>{% if toprace.handle %}<a href="{{ url_for('.display_player', handle=toprace.handle) }}">{{ toprace.handle }}</a>{% endif %}</td>
-                                <td><a href="{{ url_for('.display_game', gameid=toprace.game_id) }}">{{ toprace.game_id }}</a></td>
-                                <td>{{ timeutils.ago(toprace.when, False) }}</td>
+                                <td>{{ timeutils.span(race.score / 1000, exact=True, decimal=True) }}</td>
+                                <td>{{ race.name }}</td>
+                                <td>{% if race.handle %}<a href="{{ url_for('.display_player', handle=race.handle) }}">{{ race.handle }}</a>{% endif %}</td>
+                                <td><a href="{{ url_for('.display_game', gameid=race.game_id) }}">{{ race.game_id }}</a></td>
+                                <td>{{ timeutils.ago(race.when, False) }}</td>
                             </tr>
                         {% endfor %}
                     </tbody>
@@ -64,7 +64,6 @@
             </div>
         {% endif %}
     </div>
-    {% set games = map.recent_games(config.DISPLAY_RESULTS_RECENT) %}
     {% include 'tables/games.html' %}
     <a href="{{ url_for('.display_map_games', name=map.name) }}" class="btn btn-default pull-right">More...</a>
 {% endblock content %}

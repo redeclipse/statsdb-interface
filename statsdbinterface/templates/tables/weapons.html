@@ -16,7 +16,7 @@
                 <td>{{ redeclipse.fancy_weapon(weapon.name) }}</td>
                 <td>{{ (weapon.timeloadout / (totalwielded|sdiv) * 100)|round(0)|int }}%</td>
                 <td>{{ (weapon.timewielded / (totalwielded|sdiv) * 100)|round(0)|int }}%</td>
-                {% if weapon.is_not_wielded() %}
+                {% if weapon.timewielded == 0 %}
                     {% set weapon_time = weapon.timeloadout %}
                 {% else %}
                     {% set weapon_time = weapon.timewielded %}

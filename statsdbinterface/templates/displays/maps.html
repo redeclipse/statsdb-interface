@@ -20,18 +20,17 @@
             {% for map in pager.items %}
                 <tr>
                     <td><a href="{{ url_for('.display_map', name=map.name) }}">{{ map.name }}</a></td>
-                    <td>{{ map.game_ids|count }}</td>
-                    <td><a title="{{ map.first.time|time_ago }} ago, {{ map.first.time|time_str }}" href="{{ url_for('.display_game', gameid=map.first.id) }}">{{ map.first.id }}</a></td>
-                    <td><a title="{{ map.latest.time|time_ago }} ago, {{ map.latest.time|time_str }}" href="{{ url_for('.display_game', gameid=map.latest.id) }}">{{ map.latest.id }}</a></td>
-                    {% if map.topraces() %}
-                        {% set toprace = map.topraces()[0] %}
-                        <td>{{ timeutils.span(toprace.score / 1000, exact=True, decimal=True) }} by
-                        {% if toprace.handle %}
-                            <a href="{{ url_for('.display_player', handle=toprace.handle) }}">{{ toprace.handle }}</a>
+                    <td>{{ map.game_count }}</td>
+                    <td><a title="{{ map.first_time }} ago, {{ map.first_time|time_str }}" href="{{ url_for('.display_game', gameid=map.first_game) }}">{{ map.first_game }}</a></td>
+                    <td><a title="{{ map.last_time|time_ago }} ago, {{ map.last_time|time_str }}" href="{{ url_for('.display_game', gameid=map.last_game) }}">{{ map.last_game }}</a></td>
+                    {% if map.top_race != None %}
+                        <td>{{ timeutils.span(map.top_race_score / 1000, exact=True, decimal=True) }} by
+                        {% if map.top_race_handle != None %}
+                            <a href="{{ url_for('.display_player', handle=map.top_race_handle) }}">{{ map.top_race_handle }}</a>
                         {% else %}
-                            {{ toprace.name }}
+                            {{ map.top_race_name }}
                         {% endif %}
-                        in <a href="{{ url_for('.display_game', gameid=toprace.game_id) }}">game {{ toprace.game_id }}</a></td>
+                        in <a href="{{ url_for('.display_game', gameid=map.top_race) }}">game {{ map.top_race }}</a></td>
                     {% else %}
                         <td><i>N/A</i></td>
                     {% endif %}

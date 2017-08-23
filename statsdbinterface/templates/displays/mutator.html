@@ -7,8 +7,7 @@
 
 {% block content %}
     <h3>{{ mutator.name }}</h3>
-    <p>{{ mutator.game_ids|count }} games total.</p>
-    {% set games = mutator.recent_games(config.DISPLAY_RESULTS_RECENT) %}
+    <p>{{ game_count }} games total.</p>
     {% include 'tables/games.html' %}
-    <a href="{{ url_for('.display_mutator_games', name=mutator.name) }}" class="btn btn-default pull-right">More...</a>
+    <a href="{{ url_for('.display_mutator_games', name=mutator.link) }}" class="btn btn-default pull-right">More...</a>
 {% endblock content %}

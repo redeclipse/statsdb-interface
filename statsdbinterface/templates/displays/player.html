@@ -7,27 +7,26 @@
 {% block content %}
     <div class="row">
         <h3>{{ player.handle }}</h3>
-        <h4>{{ player.latest.name }}</h4>
-        <p>First seen {{ timeutils.ago(player.first.game.time, False) }} with <a href="{{ url_for('.display_game', gameid=player.first.game_id) }}">game {{ player.first.game_id }}</a>, Last seen {{ timeutils.ago(player.latest.game.time, False) }} with <a href="{{ url_for('.display_game', gameid=player.latest.game_id) }}">game {{ player.latest.game_id }}</a>, {{ player.game_ids|count }} games total.</p>
-        <p>Most played map is <a href="{{ url_for('.display_map', name=player.topmaps(0)[0].name) }}">{{ player.topmaps(0)[0].name }}</a> with {{ player.topmaps(0)[0].games }} game{% if player.topmaps(0)[0].games != 1 %}s{% endif %}.</p>
+        <h4>{{ player.last_name }}</h4>
+        <p>First seen {{ timeutils.ago(player.first_time, False) }} with <a href="{{ url_for('.display_game', gameid=player.first_game) }}">game {{ player.first_game }}</a>, Last seen {{ timeutils.ago(player.last_time, False) }} with <a href="{{ url_for('.display_game', gameid=player.last_game) }}">game {{ player.last_game }}</a>, {{ player.game_count }} games total.</p>
+        <p>Most played map is <a href="{{ url_for('.display_map', name=topmap.map) }}">{{ topmap.map }}</a> with {{ topmap.game_count }} game{% if topmap.game_count != 1 %}s{% endif %}.</p>
     </div>
     <div class="row">
         <h5>From the last 50 games</h5>
         <div class="col-md-3">
             <ul>
-                <li><span title="Damage per Minute">DPM</span>: {{ player.dpm(50)|round(0)|int }}</li>
-                <li><span title="Frags per Minute">FPM</span>: {{ player.fpm(50)|round(1) }}</li>
+                <li><span title="Damage per Minute">DPM</span>: {{ dpm|round(0)|int }}</li>
+                <li><span title="Frags per Minute">FPM</span>: {{ fpm|round(1) }}</li>
             </ul>
         </div>
         <div class="col-md-3">
             <ul>
-                <li>Frags/Deaths: {{ player.kdr(50)|round(1) }}</li>
-                <li>Damage/Frags: {{ player.dfr(50)|round(0)|int }}</li>
+                <li>Frags/Deaths: {{ kdr|round(1) }}</li>
+                <li>Damage/Frags: {{ dfr|round(0)|int }}</li>
             </ul>
         </div>
     </div>
     <div class="row">
-        {% set games = player.recent_games(config.DISPLAY_RESULTS_RECENT) %}
         {% include 'tables/player_games.html' %}
         <a href="{{ url_for('.display_player_games', handle=player.handle) }}" class="btn btn-default pull-right">More...</a>
     </div>

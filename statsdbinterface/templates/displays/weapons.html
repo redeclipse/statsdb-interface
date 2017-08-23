@@ -4,6 +4,6 @@
 {% block title %}Weapons{% endblock title %}
 
 {% block content %}
-    <h4>From the last 300 games</h4>
+    <h4>From the last {{recent_count}} games</h4>
     {% include 'tables/weapons.html' %}
 {% endblock content %}
