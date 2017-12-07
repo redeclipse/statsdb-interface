@@ -224,9 +224,9 @@ class Server:
             GameServer.game_id).filter(GameServer.handle == self.handle).all()
             if r[0] in all_games]
         self.latest = GameServer.query.filter(
-            GameServer.game_id == self.game_ids[-1]).first()
+            GameServer.game_id == self.game_ids[-1]).first().game_id
         self.first = GameServer.query.filter(
-            GameServer.game_id == self.game_ids[0]).first()
+            GameServer.game_id == self.game_ids[0]).first().game_id
 
     def games(self, page=0, pagesize=None):
         # Return full Game objects from Server's game_ids.

@@ -119,7 +119,7 @@ def api_games():
     return resp
 
 
-@bp.route("/api/games/<int:gameid>")
+@bp.route("/games/<int:gameid>")
 def api_game(gameid):
     """
     Return a single game.
