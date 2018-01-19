@@ -256,11 +256,10 @@ class Game(db.Model, ModeAttr):
 
     def ordered_teams(self):
         if self.is_timed():
-            def by_time(team):
-                team.score if team.score > 0 else float('inf')
-            return sorted(self.teams, key=by_time)
+            inf = float('inf')
+            return sorted(self.teams, key=lambda t: t.score or inf)
         else:
-            return sorted(self.teams, key=lambda t: t.score)
+            return sorted(self.teams, key=lambda t: t.score or 0)
 
     def player_by_wid(self, wid):
         for player in self.players:

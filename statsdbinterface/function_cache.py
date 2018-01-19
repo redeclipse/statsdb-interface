@@ -4,7 +4,7 @@ import atexit
 try:
     import config
     cache_enabled = config.CACHE
-except ImportError:
+except (ImportError, AttributeError):
     cache_enabled = True
 
 cache = {}
